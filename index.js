@@ -2,7 +2,8 @@
 
 var WebSocketServer = require('websocket').server;
 var http = require('http');
- 
+var connection;
+
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
@@ -35,7 +36,7 @@ wsServer.on('request', function(request) {
       return;
     }
     
-    var connection = request.accept('echo-protocol', request.origin);
+    connection = request.accept('echo-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
@@ -52,4 +53,7 @@ wsServer.on('request', function(request) {
     });
 });
 
-exports.server = server;
+exports.serverSend = (data) => {
+    console.log(`Sending data: connection is active? ${connection.connected}`);
+    connection.sendUTF(data);
+}

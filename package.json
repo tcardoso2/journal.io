@@ -1,6 +1,6 @@
 {
   "name": "ext_log_socket_homebridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An external (non homebridge) simple logs web-socket, for homebridge",
   "main": "index.js",
   "directories": {
@@ -11,7 +11,9 @@
     "chai": "^4.2.0",
     "websocket": "^1.0.31"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^7.0.0"
+  },
   "scripts": {
     "test": "mocha --exit"
   },

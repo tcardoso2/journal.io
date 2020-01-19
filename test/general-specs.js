@@ -39,6 +39,25 @@ describe("Considering a socket server,", function() {
     client.connect('ws://localhost:8080/', 'echo-protocol');
     setTimeout(sendNumber, 1000);
   });
+
+  it("A client should receive a message pushed by the server (trigger)", function (done) {
+    callback = (clientData) => {
+      clientData.should.equal("Message from server!!!");
+      done();
+    }
+    
+    client.connect('ws://localhost:8080/', 'echo-protocol');
+    setTimeout(() => {
+      index.serverSend("Message from server!!!");
+    }, 1000);
+  });
+
+  xit("Should be able to listen to changes to a file on the server-side (e.g. log file)", function (done) {
+    client.connect('ws://localhost:8080/', 'echo-protocol');
+    setTimeout(() => {
+      index.serverSend("Message from server!!!");
+    }, 1000);
+  });
 });
 
 client.on('connectFailed', function(error) {
