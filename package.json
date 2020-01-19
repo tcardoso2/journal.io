@@ -1,0 +1,28 @@
+{
+  "name": "ext_log_socket_homebridge",
+  "version": "0.1.0",
+  "description": "An external (non homebridge) simple logs web-socket, for homebridge",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "chai-as-promised": "^7.1.1",
+    "chai": "^4.2.0",
+    "websocket": "^1.0.31"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tcardoso2/ext_log_socket_homebridge.git"
+  },
+  "author": "Tiago Cardoso",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tcardoso2/ext_log_socket_homebridge/issues"
+  },
+  "homepage": "https://github.com/tcardoso2/ext_log_socket_homebridge#readme"
+}
