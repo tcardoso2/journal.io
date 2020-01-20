@@ -60,11 +60,19 @@ exports.serverSend = (data) => {
 }
 
 exports.sendServerOutput = (command) => {
-    cmd.get(
-        command,
-        function(err, data, stderr){
-            console.log(`Sending data: connection is active? ${connection.connected}`);
-            connection.sendUTF(data);
+    console.log("Called cmd...!");
+    let processRef = cmd.get(command);
+    let data_line = "";
+    //listen to the python terminal output
+    processRef.stdout.on(
+        'data',
+        function(data) {
+        data_line += data;
+        if (data_line[data_line.length-1] == '\n') {
+          console.log(data_line);
+          if(connection) {
+            connection.sendUTF(data_line);
+          }
         }
-    );
+    });
 }
