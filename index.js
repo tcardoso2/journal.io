@@ -2,6 +2,7 @@
 
 var WebSocketServer = require('websocket').server;
 var http = require('http');
+var cmd=require('node-cmd');
 var connection;
 
 var server = http.createServer(function(request, response) {
@@ -56,4 +57,14 @@ wsServer.on('request', function(request) {
 exports.serverSend = (data) => {
     console.log(`Sending data: connection is active? ${connection.connected}`);
     connection.sendUTF(data);
+}
+
+exports.sendServerOutput = (command) => {
+    cmd.get(
+        command,
+        function(err, data, stderr){
+            console.log(`Sending data: connection is active? ${connection.connected}`);
+            connection.sendUTF(data);
+        }
+    );
 }

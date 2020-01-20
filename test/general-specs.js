@@ -7,6 +7,7 @@ let chai = require('chai');
 let chaiAsPromised = require("chai-as-promised");
 let should = chai.should();
 let index = require("../index.js");
+const chokidar = require('chokidar');
 var WebSocketClient = require('websocket').client; 
 var client = new WebSocketClient();
 var conn;
@@ -52,10 +53,14 @@ describe("Considering a socket server,", function() {
     }, 1000);
   });
 
-  xit("Should be able to listen to changes to a file on the server-side (e.g. log file)", function (done) {
+  it("Should be able to listen to changes on stdout from a command", function (done) {
+    callback = (clientData) => {
+      clientData.indexOf('index.js').should.equal(0);
+      done();
+    }
     client.connect('ws://localhost:8080/', 'echo-protocol');
     setTimeout(() => {
-      index.serverSend("Message from server!!!");
+      index.sendServerOutput('ls');
     }, 1000);
   });
 });
