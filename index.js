@@ -59,7 +59,7 @@ exports.serverSend = (data) => {
     connection.sendUTF(data);
 }
 
-exports.sendServerOutput = (command) => {
+exports.sendServerOutput = (command, input, callback) => {
     console.log("Called cmd...!");
     let processRef = cmd.get(command);
     let data_line = "";
@@ -70,6 +70,12 @@ exports.sendServerOutput = (command) => {
         data_line += data;
         if (data_line[data_line.length-1] == '\n') {
           console.log(data_line);
+          if (callback) {
+            setTimeout(() => {
+                console.log("$$$$$$$$$$$$", data_line)
+                callback(data_line);
+            }, 1);
+          }
           if(connection) {
             connection.sendUTF(data_line);
           }
