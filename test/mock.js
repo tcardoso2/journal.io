@@ -24,4 +24,4 @@ client.on('connect', function(connection) {
 let callback = (data) => {
     console.log(">>>>>>>", data);
 }
-client.connect('ws://192.168.0.186:8080/', 'echo-protocol');
+client.connect('ws://demobox.syd01.anz.jepphost.com:8088/', 'echo-protocol');
