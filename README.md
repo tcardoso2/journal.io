@@ -1,6 +1,7 @@
 # journal.io
 An external simple logs web-socket
 
+* v 0.1.5: Minor change on test file
 * v 0.1.4: Code and test code improvements, added LOG_SOCKET_PORT environment variagle which can be used to override the server socket port. In future, the name of the library should be renamed as it does not relate to homebrige, it is a generic log socket tool. Adjusted CI instructions.
 * v 0.1.3: Added Web-page mock client. Started working with rules syntax (WIP).
 * v 0.1.2: WIP on listening to command stdout changes.
