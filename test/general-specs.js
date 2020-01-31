@@ -19,6 +19,7 @@ before(function(done) {
 
 after(function(done) {
   // here you can clear fixtures, etc.
+  client.abort();
   done();
 });
 
@@ -30,7 +31,6 @@ describe("Considering a socket server,", function() {
       if (conn.connected) {
         var number = Math.round(Math.random() * 0xFFFFFF);
         callback = (data) => {
-          client.abort();
           number.toString().should.equal(data);
           done();
         }
@@ -44,7 +44,6 @@ describe("Considering a socket server,", function() {
 
   it("A client should receive a message pushed by the server (trigger)", function (done) {
     callback = (clientData) => {
-      client.abort();
       clientData.should.equal("Message from server!!!");
       done();
     }
@@ -56,14 +55,14 @@ describe("Considering a socket server,", function() {
   });
 
   it("Should be able to listen to changes on stdout from a command", function (done) {
+    this.timeout(4000);
     callback = (clientData) => {
-      client.abort();
-      clientData.indexOf('index.js').should.be.gt(-1);
+      clientData.trim().should.eql('"TEST"');
       done();
     }
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
-      server.sendServerOutput('ls');
+      server.sendServerOutput('echo "TEST"');
     }, 1000);
   });
 });

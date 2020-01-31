@@ -22,7 +22,7 @@ client.on('connect', function(connection) {
     conn = connection;
     connection.on('error', function(error) {
         console.log("Connection Error: " + error.toString());
-    });''
+    });
     connection.on('close', function() {
         console.log('echo-protocol Connection Closed');
     });

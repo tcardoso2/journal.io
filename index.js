@@ -4,11 +4,11 @@ var WebSocketServer = require('websocket').server;
 var http = require('http');
 var cmd=require('node-cmd');
 var connection;
+var processRules = require('./lib/ruleProcessor').process;
 
 const DEFAULT_PORT = 8088;
 
 var getPort = () => process.env.LOG_SOCKET_PORT || DEFAULT_PORT;
-
 
 var server = http.createServer((request, response) => {
     console.log((new Date()) + ' Received request for ' + request.url);
@@ -28,7 +28,8 @@ wsServer = new WebSocketServer({
     // to accept it.
     autoAcceptConnections: false
 });
- 
+
+//internal functions
 function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed.
   return true;
@@ -66,8 +67,8 @@ exports.serverSend = (data) => {
     connection.sendUTF(data);
 }
 
-exports.sendServerOutput = (command, input, callback) => {
-    console.log("Called cmd...!");
+exports.sendServerOutput = (command, rules = [], callback, send = true) => {
+    //console.log(`Called cmd '${command}'...!`);
     let processRef = cmd.get(command);
     let data_line = "";
     //listen to the python terminal output
@@ -76,13 +77,25 @@ exports.sendServerOutput = (command, input, callback) => {
         function(data) {
         data_line += data;
         if (data_line[data_line.length-1] == '\n') {
-          console.log(data_line);
-          if (callback) {
-            setTimeout(() => {
-            }, 1);
-          }
-          if(connection) {
-            connection.sendUTF(data_line);
+          try{
+            processRules(data_line, rules, (output) => {
+              //console.log(data_line);
+              if (callback) {
+                setTimeout(() => {
+                callback(false, output);
+                }, 1);
+              }
+              if(send && connection) {
+                connection.sendUTF(output);
+              }
+            });
+          } catch(e) {
+            if (callback) {
+              callback(true, e.message);
+            } else { //Re-throw
+              throw e;
+            }
+            return;
           }
         }
     });
