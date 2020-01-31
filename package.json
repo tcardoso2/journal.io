@@ -26,12 +26,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tcardoso2/ext_log_socket_homebridge.git"
+    "url": "git+https://github.com/tcardoso2/journal.io.git"
   },
   "author": "Tiago Cardoso",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tcardoso2/ext_log_socket_homebridge/issues"
+    "url": "https://github.com/tcardoso2/journal.io/issues"
   },
-  "homepage": "https://github.com/tcardoso2/ext_log_socket_homebridge#readme"
+  "homepage": "https://github.com/tcardoso2/journal.io#readme"
 }
