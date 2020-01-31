@@ -7,7 +7,11 @@ platform:
   arch: arm
 
 steps:
-- name: mocha
+- name: installdeps
+  image: node
+  commands:
+  - npm install -g mocha
+- name: test
   image: node
   commands:
   - npm test
