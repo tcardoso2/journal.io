@@ -1,7 +1,7 @@
 {
-  "name": "ext_log_socket_homebridge",
+  "name": "journal.io",
   "version": "0.1.4",
-  "description": "An external (non homebridge) simple logs web-socket, for homebridge",
+  "description": "An external (non homebridge) simple logs web-socket",
   "main": "index.js",
   "directories": {
     "test": "test"
