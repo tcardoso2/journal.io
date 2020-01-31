@@ -10,7 +10,7 @@ steps:
 - name: installdeps
   image: node
   commands:
-  - npm install -g mocha
+  - npm install
 - name: test
   image: node
   commands:
