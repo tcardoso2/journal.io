@@ -58,7 +58,7 @@ describe("Considering a socket server,", function() {
   it("Should be able to listen to changes on stdout from a command", function (done) {
     callback = (clientData) => {
       client.abort();
-      clientData.indexOf('index.js').should.equal(0);
+      clientData.indexOf('index.js').should.be.gt(-1);
       done();
     }
     client.connect(server.getEndpoint(), 'echo-protocol');
