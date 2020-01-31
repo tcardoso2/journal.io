@@ -6,7 +6,7 @@
 let chai = require('chai');
 let chaiAsPromised = require("chai-as-promised");
 let should = chai.should();
-let index = require("../index.js");
+let server = require("../index.js");
 const chokidar = require('chokidar');
 var WebSocketClient = require('websocket').client; 
 var client = new WebSocketClient();
@@ -38,7 +38,7 @@ describe("Considering a socket server,", function() {
       }
     }
     //Evaluate
-    client.connect('ws://localhost:8080/', 'echo-protocol');
+    client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(sendNumber, 1000);
   });
 
@@ -49,9 +49,9 @@ describe("Considering a socket server,", function() {
       done();
     }
     
-    client.connect('ws://localhost:8080/', 'echo-protocol');
+    client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
-      index.serverSend("Message from server!!!");
+      server.serverSend("Message from server!!!");
     }, 1000);
   });
 
@@ -61,9 +61,9 @@ describe("Considering a socket server,", function() {
       clientData.indexOf('index.js').should.equal(0);
       done();
     }
-    client.connect('ws://localhost:8080/', 'echo-protocol');
+    client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
-      index.sendServerOutput('ls');
+      server.sendServerOutput('ls');
     }, 1000);
   });
 });

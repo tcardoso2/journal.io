@@ -5,13 +5,18 @@ var http = require('http');
 var cmd=require('node-cmd');
 var connection;
 
-var server = http.createServer(function(request, response) {
+const DEFAULT_PORT = 8088;
+
+var getPort = () => process.env.LOG_SOCKET_PORT || DEFAULT_PORT;
+
+
+var server = http.createServer((request, response) => {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
-server.listen(8080, function() {
-    console.log((new Date()) + ' Server is listening on port 8080');
+server.listen(getPort(), function() {
+    console.log((new Date()) + ` Server is listening on port ${getPort()}`);
 });
  
 wsServer = new WebSocketServer({
@@ -54,6 +59,8 @@ wsServer.on('request', function(request) {
     });
 });
 
+//Public exports
+
 exports.serverSend = (data) => {
     console.log(`Sending data: connection is active? ${connection.connected}`);
     connection.sendUTF(data);
@@ -72,8 +79,6 @@ exports.sendServerOutput = (command, input, callback) => {
           console.log(data_line);
           if (callback) {
             setTimeout(() => {
-                console.log("$$$$$$$$$$$$", data_line)
-                callback(data_line);
             }, 1);
           }
           if(connection) {
@@ -82,3 +87,7 @@ exports.sendServerOutput = (command, input, callback) => {
         }
     });
 }
+
+exports.getPort = getPort;
+
+exports.getEndpoint = () => `ws://localhost:${getPort()}/`;

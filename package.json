@@ -1,6 +1,6 @@
 {
   "name": "ext_log_socket_homebridge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "An external (non homebridge) simple logs web-socket, for homebridge",
   "main": "index.js",
   "directories": {
