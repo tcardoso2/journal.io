@@ -57,12 +57,12 @@ describe("Considering a socket server,", function() {
   it("Should be able to listen to changes on stdout from a command", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
-      clientData.trim().should.eql('"TEST"');
+      clientData.trim().should.eql('TEST');
       done();
     }
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
-      server.sendServerOutput('echo "TEST"');
+      server.sendServerOutput('echo TEST');
     }, 1000);
   });
 });
