@@ -25,8 +25,8 @@ after(function(done) {
 describe("Considering a rules configuration file,", function() {
   it("The server should have a callback function triggered just before sending the reponse to the socket", function (done) {
     //Prepare
-    index.sendServerOutput('echo "Some Stuff!"', [], (err, output) => {
-      output.trim().should.equal('"Some Stuff!"')
+    index.sendServerOutput('echo Some Stuff!', [], (err, output) => {
+      output.trim().should.equal('Some Stuff!')
       done()
     }, false) //Don't send anything from socket as it might interfere with other tests
   });
@@ -49,7 +49,8 @@ describe("Considering a rules configuration file,", function() {
     index.sendServerOutput('echo Some Stuff!', [
       [".split", " "]
     ], (err, output) => {
-      output.should.be.eql(["Some",  "Stuff!\r\n"])
+      output[0].should.equal("Some")
+      output[1].trim().should.equal("Stuff!")
       err.should.equal(false)
       done()
     }, false)
