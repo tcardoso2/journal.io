@@ -7,11 +7,12 @@ platform:
   arch: arm
 
 steps:
-- name: installdeps
+- name: install_deps
   image: node
   commands:
   - npm install
-- name: test
+
+- name: unit_test
   image: node
   commands:
   - npm test
