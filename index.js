@@ -6,9 +6,13 @@ var cmd=require('node-cmd');
 var connection;
 var processRules = require('./lib/ruleProcessor').process;
 
-const DEFAULT_PORT = 8088;
+let DEFAULT_PORT = 8088;
 
-var getPort = () => process.env.LOG_SOCKET_PORT || DEFAULT_PORT;
+var getPort = () => DEFAULT_PORT;
+
+var setPort = (port) => DEFAULT_PORT = port;
+
+console.log(process.env.LOG_SOCKET_PORT);
 
 var server = http.createServer((request, response) => {
     console.log((new Date()) + ' Received request for ' + request.url);
@@ -102,5 +106,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
 }
 
 exports.getPort = getPort;
+
+exports.setPort = setPort;
 
 exports.getEndpoint = () => `ws://localhost:${getPort()}/`;

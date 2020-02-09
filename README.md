@@ -1,6 +1,7 @@
 # journal.io
 An external simple logs web-socket
 
+* v 0.1.7: Added setPort to allow changing the default port of a given instance without having to fiddle with Environment variables, removed ENV variable setting for ports
 * v 0.1.6: Added first rules, split, trim, length, array (WIP)
 * v 0.1.5: Minor change on test file
 * v 0.1.4: Code and test code improvements, added LOG_SOCKET_PORT environment variagle which can be used to override the server socket port. In future, the name of the library should be renamed as it does not relate to homebrige, it is a generic log socket tool. Adjusted CI instructions.
