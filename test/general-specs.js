@@ -8,10 +8,10 @@ let chaiAsPromised = require("chai-as-promised");
 let should = chai.should();
 let server = require("../index.js");
 const chokidar = require('chokidar');
-var WebSocketClient = require('websocket').client; 
-var client = new WebSocketClient();
-var conn;
-var callback;
+let WebSocketClient = require('websocket').client; 
+let client = new WebSocketClient();
+let conn;
+let callback;
 
 before(function(done) {
   done();
@@ -26,20 +26,26 @@ after(function(done) {
 describe("Considering a socket server,", function() {
   it("A client should be able to connect to it", function (done) {
     //Prepare
-
+    this.timeout(4000);
     function sendNumber() {
+      var number = Math.round(Math.random() * 0xFFFFFF);
+      callback = (data) => {
+        number.toString().should.equal(data);
+        done();
+      }
       if (conn.connected) {
-        var number = Math.round(Math.random() * 0xFFFFFF);
-        callback = (data) => {
-          number.toString().should.equal(data);
-          done();
-        }
         conn.sendUTF(number.toString());
       }
+      else {
+        console.error("Client not connected yet!, test will fail.");
+      }
     }
-    //Evaluate
-    client.connect(server.getEndpoint(), 'echo-protocol');
-    setTimeout(sendNumber, 1000);
+    server.configure();
+    server.start((a) => {
+      //Evaluate
+      client.connect(server.getEndpoint(), 'echo-protocol');
+      setTimeout(sendNumber, 1000);
+    });
   });
 
   it("A client should receive a message pushed by the server (trigger)", function (done) {
@@ -72,7 +78,7 @@ client.on('connectFailed', function(error) {
 });
  
 client.on('connect', function(connection) {
-    console.log('Client Connected');
+    console.log('Client Connected!');
     conn = connection;
     connection.on('error', function(error) {
         console.log("Connection Error: " + error.toString());
@@ -82,7 +88,7 @@ client.on('connect', function(connection) {
     });
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
-            console.log("Received: '" + message.utf8Data + "'");
+            console.log(`Received: "${message.utf8Data}", returning to callback now...`);
             callback(message.utf8Data);
         }
     });
