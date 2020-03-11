@@ -6,9 +6,9 @@ var cmd=require('node-cmd');
 var connection;
 var processRules = require('./lib/ruleProcessor').process;
 
-let DEFAULT_PORT = 8068;
+let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 
-console.log(process.env.LOG_SOCKET_PORT);
+console.log(DEFAULT_PORT);
 
 var server;
 
