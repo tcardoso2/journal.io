@@ -43,6 +43,7 @@ npm test
 
 Version History
 ---------------
+* v 0.1.9: Bug fix: sending just the line changed and not the full output
 * v 0.1.8: Server now does not start when required (imported), but only after running "configure()" and "start()" method
 * v 0.1.7: Added setPort to allow changing the default port of a given instance without having to fiddle with Environment variables, removed ENV variable setting for ports
 * v 0.1.7: Added setPort to allow changing the default port of a given instance without having to fiddle with Environment variables, removed ENV variable setting for ports

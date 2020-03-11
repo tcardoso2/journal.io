@@ -94,34 +94,38 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
     //console.log(`Called cmd '${command}'...!`);
     let processRef = cmd.get(command);
     let data_line = "";
-    //listen to the python terminal output
+    //listen to the terminal output
     processRef.stdout.on(
         'data',
         function(data) {
-        data_line += data;
-        if (data_line[data_line.length-1] == '\n') {
-          try{
-            processRules(data_line, rules, (output) => {
-              //console.log(data_line);
+          data_line += data;
+          if (data_line[data_line.length-1] == '\n') {
+            //Make sure we really copy the original string and not a reference of it
+            let dataToSend = '' + data_line;
+            data_line = ""; //We don't need it anymore
+            try{
+              processRules(dataToSend, rules, (output) => {
+                //console.log(data_line);
+                if (callback) {
+                  setTimeout(() => {
+                  callback(false, output);
+                  }, 1);
+                }
+                if(send && connection) {
+                  connection.sendUTF(output);
+                }
+              });
+            } catch(e) {
               if (callback) {
-                setTimeout(() => {
-                callback(false, output);
-                }, 1);
+                callback(true, e.message);
+              } else { //Re-throw
+                throw e;
               }
-              if(send && connection) {
-                connection.sendUTF(output);
-              }
-            });
-          } catch(e) {
-            if (callback) {
-              callback(true, e.message);
-            } else { //Re-throw
-              throw e;
+              return;
             }
-            return;
           }
-        }
-    });
+      }
+    );
 }
 
 exports.getPort = getPort;
