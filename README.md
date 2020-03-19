@@ -1,4 +1,17 @@
 # journal.io
+
+```
+    ___  ________  ___  ___  ________  ________   ________  ___           ___  ________     
+   |\  \|\   __  \|\  \|\  \|\   __  \|\   ___  \|\   __  \|\  \         |\  \|\   __  \    
+   \ \  \ \  \|\  \ \  \\\  \ \  \|\  \ \  \\ \  \ \  \|\  \ \  \        \ \  \ \  \|\  \   
+ __ \ \  \ \  \\\  \ \  \\\  \ \   _  _\ \  \\ \  \ \   __  \ \  \        \ \  \ \  \\\  \  
+|\  \\_\  \ \  \\\  \ \  \\\  \ \  \\  \\ \  \\ \  \ \  \ \  \ \  \____  __\ \  \ \  \\\  \ 
+\ \________\ \_______\ \_______\ \__\\ _\\ \__\\ \__\ \__\ \__\ \_______\\__\ \__\ \_______\
+ \|________|\|_______|\|_______|\|__|\|__|\|__| \|__|\|__|\|__|\|_______\|__|\|__|\|_______|
+                                                                                            
+(Fonts by http://patorjk.com/software/taag)                                                                                        
+```
+
 An external simple logs web-socket server.
 Meant originally to send log updates via web-socket but it can run
 any command and capture it's output.
@@ -43,6 +56,7 @@ npm test
 
 Version History
 ---------------
+* v 0.1.11: Implementing handling of clients which do not specify protocol, before it was crashing the server.
 * v 0.1.10: Re-adding again LOG_SOCKET_PORT as environment variable
 * v 0.1.9: Bug fix: sending just the line changed and not the full output
 * v 0.1.8: Server now does not start when required (imported), but only after running "configure()" and "start()" method

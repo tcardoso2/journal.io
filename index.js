@@ -59,8 +59,15 @@ var configure = () => {
       console.log("SERVER: " + (new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
       return;
     }
+    console.log(("SERVER: " + new Date()) + ' Received a request attempting to validate protocol...');
+    try {
+      connection = request.accept('echo-protocol', request.origin);
+    } catch(e) {
+      console.error(e);
+      console.log("Server will reject this connection and carry on...");
+      return;
+    }
     
-    connection = request.accept('echo-protocol', request.origin);
     console.log(("SERVER: " + new Date()) + ' Connection accepted.');
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
@@ -108,7 +115,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
                 //console.log(data_line);
                 if (callback) {
                   setTimeout(() => {
-                  callback(false, output);
+                    callback(false, output);
                   }, 1);
                 }
                 if(send && connection) {
