@@ -144,4 +144,4 @@ exports.start = start;
 
 exports.configure = configure;
 
-exports.lib = library;
+exports.Lib = library;

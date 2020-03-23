@@ -42,7 +42,6 @@ describe("Considering a socket server,", function() {
     this.timeout(4000);
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
-      console.log(">>>>>>>>>", server.Lib)
       server.Lib('ping').pingOne((result) => {
         console.log(result);
         done();
