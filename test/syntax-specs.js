@@ -122,3 +122,24 @@ describe("Considering a rules configuration file,", function() {
     }, false)
   });
 });
+
+describe("Homebridge-like logs,", function() {
+  it("Parse square brackets portion", function (done) {
+    //Prepare
+    let message = '[message] Data received from server: [3/13/2020, 11:28:20 PM] \
+[MiAqaraPlatform] [DEBUG][Revc] \
+{"cmd":"report","model":"motion","sid":"158d0002f0bdf9","short_id":45191,"data":"{\"no_motion\":\"300\"}"}'
+    this.timeout(5000)
+    index.sendServerOutput(`echo ${message}`, [
+      [".trim"],      
+      [".split", "["],
+      [".filter", (el) => el != "" ],
+      ["=result"]
+    ], (err, output) => {
+      console.log("^^^^^", output)
+      output.should.equal("Some Magic!!")
+      err.should.equal(false)
+      done()
+    }, false)
+  });
+});
