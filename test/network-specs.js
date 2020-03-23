@@ -39,9 +39,10 @@ describe("Considering a socket server,", function() {
   });
 
   it("A client should receive the result of the ping function from Advanced Libraries", function (done) {
-    this.timeout(10000);
+    this.timeout(4000);
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
+      console.log(">>>>>>>>>", server.Lib)
       server.Lib('ping').pingOne((result) => {
         console.log(result);
         done();

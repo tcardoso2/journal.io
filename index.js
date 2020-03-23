@@ -2,8 +2,9 @@
 
 var WebSocketServer = require('websocket').server;
 var http = require('http');
-var cmd=require('node-cmd');
+var cmd = require('./lib/command');
 var connection;
+var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
@@ -11,6 +12,15 @@ let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 console.log(DEFAULT_PORT);
 
 var server;
+
+var library = (_name) => {
+  switch(_name) {
+    case "ping":
+      return Library(_name);
+    default:
+      throw new Error(`${_name} is not a defined library.`);
+  }
+}
 
 var reset = (close = true, callback) => {
   server.close();
@@ -99,40 +109,29 @@ exports.serverSend = (data) => {
 
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
     //console.log(`Called cmd '${command}'...!`);
-    let processRef = cmd.get(command);
-    let data_line = "";
-    //listen to the terminal output
-    processRef.stdout.on(
-        'data',
-        function(data) {
-          data_line += data;
-          if (data_line[data_line.length-1] == '\n') {
-            //Make sure we really copy the original string and not a reference of it
-            let dataToSend = '' + data_line;
-            data_line = ""; //We don't need it anymore
-            try{
-              processRules(dataToSend, rules, (output) => {
-                //console.log(data_line);
-                if (callback) {
-                  setTimeout(() => {
-                    callback(false, output);
-                  }, 1);
-                }
-                if(send && connection) {
-                  connection.sendUTF(output);
-                }
-              });
-            } catch(e) {
-              if (callback) {
-                callback(true, e.message);
-              } else { //Re-throw
-                throw e;
-              }
-              return;
-            }
+    cmd.do(command, (dataToSend) => {
+      try{
+        processRules(dataToSend, rules, (output) => {
+          //console.log(data_line);
+          if (callback) {
+            setTimeout(() => {
+              callback(false, output);
+            }, 1);
           }
+          if(send && connection) {
+            connection.sendUTF(output);
+          }
+        });
+      } catch(e) {
+        if (callback) {
+          callback(true, e.message);
+        } else { //Re-throw
+          throw e;
+        }
+        return;
+      
       }
-    );
+    });
 }
 
 exports.getPort = getPort;
@@ -144,3 +143,5 @@ exports.getEndpoint = () => `ws://localhost:${getPort()}/`;
 exports.start = start;
 
 exports.configure = configure;
+
+exports.lib = library;
