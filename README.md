@@ -56,6 +56,7 @@ npm test
 
 Version History
 ---------------
+* v 0.2.0: Starting to implement more complex pre-defined core functions ran from libraries instead of direct terminal commands (WIP); created node-cmd wrapper for simplifying issuing terminal commands.
 * v 0.1.11: Implementing handling of clients which do not specify protocol, before it was crashing the server.
 * v 0.1.10: Re-adding again LOG_SOCKET_PORT as environment variable
 * v 0.1.9: Bug fix: sending just the line changed and not the full output
