@@ -21,7 +21,7 @@ any command and capture it's output.
 npm install journal.io
 ```
 
-* Simple example usage
+* Simple example usage (Server):
 ```
 let server = require('journal.io');
 
@@ -31,6 +31,7 @@ server.start(() => {
   server.sendServerOutput(`tail -f somelogfile.log`);
 });
 ```
+Then you can connect via web-sockets client (see examples referenced below)
 
 Rules (WIP)
 -----------
@@ -40,7 +41,7 @@ I'll update this section soon with details.
 Test socket clients
 -------------------
 Inside the "lib" folder there are 2 socket clients which you can use if you want:
-* Server-side client (NodeJS): mock.js
+* 'Server-side' (NodeJS) client: mock.js
 * HTML client (Javascript): mock.html
 
 Tests (mocha)
