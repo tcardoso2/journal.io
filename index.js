@@ -13,13 +13,17 @@ console.log(DEFAULT_PORT);
 
 var server;
 
-var library = (_name) => {
-  switch(_name) {
+var library = (name) => {
+  switch(name) {
     case "ping":
-      return Library(_name);
+      return Library(name);
     default:
-      throw new Error(`${_name} is not a defined library.`);
+      throw new Error(`${name} is not a defined library.`);
   }
+}
+
+var libraryCommand = (channel, callback) => {
+  return library(channel.lib)[channel.func](callback);
 }
 
 var reset = (close = true, callback) => {
@@ -63,6 +67,7 @@ var configure = () => {
     autoAcceptConnections: false
   });  
   wsServer.on('request', function(request) {
+    console.log("******************", request.resource);
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin
       request.reject();
@@ -109,7 +114,8 @@ exports.serverSend = (data) => {
 
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
     //console.log(`Called cmd '${command}'...!`);
-    cmd.do(command, (dataToSend) => {
+    let fn = typeof command == "string" ? cmd.do : libraryCommand;
+    fn(command, (dataToSend) => {
       try{
         processRules(dataToSend, rules, (output) => {
           //console.log(data_line);
@@ -129,7 +135,6 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
           throw e;
         }
         return;
-      
       }
     });
 }
@@ -138,7 +143,7 @@ exports.getPort = getPort;
 
 exports.setPort = setPort;
 
-exports.getEndpoint = () => `ws://localhost:${getPort()}/`;
+exports.getEndpoint = () => `ws://localhost:${getPort()}`;
 
 exports.start = start;
 

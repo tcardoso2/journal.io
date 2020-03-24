@@ -44,7 +44,7 @@ describe("Considering a socket server,", function() {
     server.start((a) => {
       //Evaluate
       client.connect(server.getEndpoint(), 'echo-protocol');
-      setTimeout(sendNumber, 1000);
+      setTimeout(sendNumber, 100);
     });
   });
 
@@ -57,7 +57,7 @@ describe("Considering a socket server,", function() {
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
       server.serverSend("Message from server!!!");
-    }, 1000);
+    }, 100);
   });
 
   it("Should be able to listen to changes on stdout from a command", function (done) {
@@ -69,7 +69,36 @@ describe("Considering a socket server,", function() {
     client.connect(server.getEndpoint(), 'echo-protocol');
     setTimeout(() => {
       server.sendServerOutput('echo TEST');
-    }, 1000);
+    }, 100);
+  });
+
+  it("Should not be able to listen to 'ping' url, when ping was sent from root url", function (done) {
+    this.timeout(4000);
+    callback = (clientData) => {
+      clientData.trim().should.eql('PING');
+      should.fail();
+    }
+    client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
+    setTimeout(() => {
+      server.sendServerOutput('echo PING');
+    }, 100);
+    setTimeout(() => { done(); }, 2000)
+  });
+
+  it("Should be able to listen to 'ping' url, when ping was sent from 'ping' url", function (done) {
+    this.timeout(4000);
+    callback = (clientData) => {
+      clientData.trim().should.eql('PING2');
+      done();
+    }
+    client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
+    setTimeout(() => {
+      server.sendServerOutput({
+        lib: "ping",
+        func: "pingOne2",
+        channel: "ping"
+      });
+    }, 100);
   });
 });
 
