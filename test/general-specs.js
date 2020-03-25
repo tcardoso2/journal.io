@@ -72,7 +72,30 @@ describe("Considering a socket server,", function() {
     }, 100);
   });
 
-  it("Should not be able to listen to 'ping' url, when ping was sent from root url", function (done) {
+  it("Should be able to listen to 'ping', as a result of a library function call", function (done) {
+    this.timeout(4000);
+    callback = (clientData) => {
+      clientData = JSON.parse(clientData);
+      (clientData.error == null).should.eql(true);
+      clientData.ttl.should.be.gt(0);
+      done();
+    }
+    client.connect(server.getEndpoint(), 'echo-protocol');
+    setTimeout(() => {
+      server.sendServerOutput({
+        lib: "ping",
+        func: "pingOne",
+        channel: "ping"
+      });
+    }, 100);
+  });
+
+  it("Should be able get the number of active connections", function (done) {
+    server.getConnectionsCount().should.eql(1);
+    done();
+  });
+
+  it("Should not be able to listen to 'ping' url, when message was sent from root url", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
       clientData.trim().should.eql('PING');
@@ -83,25 +106,6 @@ describe("Considering a socket server,", function() {
       server.sendServerOutput('echo PING');
     }, 100);
     setTimeout(() => { done(); }, 2000)
-  });
-
-  it("Should be able to listen to 'ping', when ping was sent from ping url", function (done) {
-    this.timeout(4000);
-    callback = (clientData) => {
-      clientData = JSON.stringify(clientData);
-      console.log(clientData);
-      (clientData.error == null).should.eql(true);
-      clientData.ttl.should.be.gt(0);
-      done();
-    }
-    client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
-    setTimeout(() => {
-      server.sendServerOutput({
-        lib: "ping",
-        func: "pingOne",
-        channel: "ping"
-      });
-    }, 100);
   });
 });
 

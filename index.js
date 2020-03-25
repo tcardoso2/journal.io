@@ -3,7 +3,7 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 var cmd = require('./lib/command');
-var connection;
+var connections = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 
@@ -24,7 +24,6 @@ var library = (name) => {
 
 var libraryCommand = (channel, callback) => {
   return library(channel.lib)[channel.func]((msg) => {
-    console.log("Function result: ", msg);
     callback(typeof msg == 'string' ? msg : JSON.stringify(msg)); 
   });
 }
@@ -37,6 +36,10 @@ var reset = (close = true, callback) => {
       callback(a);
     }
   });
+}
+
+var getConnectionsCount = () => {
+  return Object.keys(connections).length;
 }
 
 var getPort = () => DEFAULT_PORT;
@@ -54,6 +57,7 @@ var start = (callback) => {
 }
 
 var configure = () => {
+  let connection;
   server = http.createServer((request, response) => {
     console.log("SERVER: " + (new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
@@ -100,7 +104,8 @@ var configure = () => {
     connection.on('close', function(reasonCode, description) {
         console.log("SERVER: " + (new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
-  });  
+    connections[request.resource] = connection;
+  });
 }
 //internal functions
 function originIsAllowed(origin) {
@@ -110,9 +115,9 @@ function originIsAllowed(origin) {
 
 //Public exports
 
-exports.serverSend = (data) => {
-    console.log("SERVER: " + (new Date()) + `Sending data: connection is active? ${connection.connected}`);
-    connection.sendUTF(data);
+exports.serverSend = (data, channel = '/') => {
+    console.log("SERVER: " + (new Date()) + `Sending data: connection '${channel}' is active? ${connections[channel].connected}`);
+    connections[channel].sendUTF(data);
 }
 
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
@@ -127,8 +132,8 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
               callback(false, output);
             }, 1);
           }
-          if(send && connection) {
-            connection.sendUTF(output);
+          if(send && connections[command.channel]) {
+            connections[command.channel].sendUTF(output);
           }
         });
       } catch(e) {
@@ -153,3 +158,5 @@ exports.start = start;
 exports.configure = configure;
 
 exports.Lib = library;
+
+exports.getConnectionsCount = getConnectionsCount;
