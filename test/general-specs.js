@@ -85,17 +85,20 @@ describe("Considering a socket server,", function() {
     setTimeout(() => { done(); }, 2000)
   });
 
-  it("Should be able to listen to 'ping' url, when ping was sent from 'ping' url", function (done) {
+  it("Should be able to listen to 'ping', when ping was sent from ping url", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
-      clientData.trim().should.eql('PING2');
+      clientData = JSON.stringify(clientData);
+      console.log(clientData);
+      (clientData.error == null).should.eql(true);
+      clientData.ttl.should.be.gt(0);
       done();
     }
     client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
     setTimeout(() => {
       server.sendServerOutput({
         lib: "ping",
-        func: "pingOne2",
+        func: "pingOne",
         channel: "ping"
       });
     }, 100);

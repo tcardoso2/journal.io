@@ -23,7 +23,10 @@ var library = (name) => {
 }
 
 var libraryCommand = (channel, callback) => {
-  return library(channel.lib)[channel.func](callback);
+  return library(channel.lib)[channel.func]((msg) => {
+    console.log("Function result: ", msg);
+    callback(typeof msg == 'string' ? msg : JSON.stringify(msg)); 
+  });
 }
 
 var reset = (close = true, callback) => {
