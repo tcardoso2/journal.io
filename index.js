@@ -7,13 +7,16 @@ var connections = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 
+let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
+var log = require('./lib/utils.js').setLevel(LOG_LEVEL);
 
-console.log(DEFAULT_PORT);
+log.info(` Default port: ${DEFAULT_PORT}`);
 
 var server;
 
 var library = (name) => {
+  log.debug(`Called function with args: "${name}"`);
   switch(name) {
     case "ping":
       return Library(name);
@@ -23,33 +26,47 @@ var library = (name) => {
 }
 
 var libraryCommand = (channel, callback) => {
+  log.debug(`Called function with args: "${channel}", "${callback}`);
   return library(channel.lib)[channel.func]((msg) => {
+    log.debug(`Called function with args: "${msg}"`);
     callback(typeof msg == 'string' ? msg : JSON.stringify(msg)); 
   });
 }
 
 var reset = (close = true, callback) => {
+  log.debug(`Called function with args: "${close}", "${callback}`);
   server.close();
   server.listen(getPort(), function(a) {
-    console.log("SERVER: " + (new Date()) + ` Server is listening on port ${getPort()}`);
+    log.info(`Server is listening on port ${getPort()}`);
     if (callback) {
       callback(a);
     }
   });
 }
 
-var getConnectionsCount = () => {
-  return Object.keys(connections).length;
+var getChannels = () => {
+  log.debug(`Called function`);
+  return Object.keys(connections);
 }
 
-var getPort = () => DEFAULT_PORT;
+var getConnectionsCount = () => {
+  log.debug(`Called function`);
+  return getChannels().length;
+}
+
+var getPort = () => {
+  log.debug(`Called function`);
+  return DEFAULT_PORT;
+}
 
 var setPort = (port) => {
+  log.debug(`Called function with args: "${port}"`);
   DEFAULT_PORT = port;
   reset();
 }
 
 var start = (callback) => {
+  log.debug(`Called function with args: "${callback}`);
   if(!server) {
     throw new Error("No server instance found. Did you forget to run 'configure()' first?");
   }
@@ -57,9 +74,10 @@ var start = (callback) => {
 }
 
 var configure = () => {
+  log.debug(`Called function`);
   let connection;
   server = http.createServer((request, response) => {
-    console.log("SERVER: " + (new Date()) + ' Received request for ' + request.url);
+    logi.info(' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
   });
@@ -74,35 +92,36 @@ var configure = () => {
     autoAcceptConnections: false
   });  
   wsServer.on('request', function(request) {
-    console.log("******************", request.resource);
+    log.debug(`Called function with args: "${request}`);
+    log.info(' Requesting connection to channel: ' + request.resource);
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin
       request.reject();
-      console.log("SERVER: " + (new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+      log.warning('Connection from origin ' + request.origin + ' rejected.');
       return;
     }
-    console.log(("SERVER: " + new Date()) + ' Received a request attempting to validate protocol...');
+    log.info('Received a request attempting to validate protocol...');
     try {
       connection = request.accept('echo-protocol', request.origin);
     } catch(e) {
-      console.error(e);
-      console.log("Server will reject this connection and carry on...");
+      log.error(e);
+      log.warn("Server will reject this connection and carry on...");
       return;
     }
     
-    console.log(("SERVER: " + new Date()) + ' Connection accepted.');
+    log.info('Connection accepted.');
     connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log("SERVER: " + (new Date()) + 'Received Message: ' + message.utf8Data);
-            connection.sendUTF(message.utf8Data);
-        }
-        else if (message.type === 'binary') {
-            console.log("SERVER: " + (new Date()) + 'Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
-        }
+      if (message.type === 'utf8') {
+        log.info('Received Message: ' + message.utf8Data);
+        connection.sendUTF(message.utf8Data);
+      }
+      else if (message.type === 'binary') {
+        log.info('Received Binary Message of ' + message.binaryData.length + ' bytes');
+        connection.sendBytes(message.binaryData);
+      }
     });
     connection.on('close', function(reasonCode, description) {
-        console.log("SERVER: " + (new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+      log.info(' Peer ' + connection.remoteAddress + ' disconnected.');
     });
     connections[request.resource] = connection;
   });
@@ -116,35 +135,47 @@ function originIsAllowed(origin) {
 //Public exports
 
 exports.serverSend = (data, channel = '/') => {
-    console.log("SERVER: " + (new Date()) + `Sending data: connection '${channel}' is active? ${connections[channel].connected}`);
-    connections[channel].sendUTF(data);
+  log.info(`Sending data: connection '${channel}' is active? ${connections[channel].connected}`);
+  connections[channel].sendUTF(data);
 }
 
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
-    //console.log(`Called cmd '${command}'...!`);
-    let fn = typeof command == "string" ? cmd.do : libraryCommand;
-    fn(command, (dataToSend) => {
-      try{
-        processRules(dataToSend, rules, (output) => {
-          //console.log(data_line);
-          if (callback) {
-            setTimeout(() => {
-              callback(false, output);
-            }, 1);
-          }
-          if(send && connections[command.channel]) {
-            connections[command.channel].sendUTF(output);
-          }
-        });
-      } catch(e) {
+  //console.log(`Called cmd '${command}'...!`);
+  let fn = typeof command == "string" ? cmd.do : libraryCommand;
+  fn(command, (dataToSend) => {
+    log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
+    try{
+      log.info('Received output, initiating rules processing...');
+      processRules(dataToSend, rules, (output) => {
+        //console.log(data_line);
         if (callback) {
-          callback(true, e.message);
-        } else { //Re-throw
-          throw e;
+          setTimeout(() => {
+            log.info('Returning to callback');
+            log.debug(output);
+            callback(false, output);
+          }, 1);
         }
-        return;
+        log.info(`SOCKET: sendUTF event to channel '${command.channel}'?`);
+        log.debug(`${send}, '${command.channel}', ${connections[command.channel]}`);
+        if(send) {
+          if(connections[command.channel]) {
+            connections[command.channel].sendUTF(output);
+            log.info('sent info via socket to channel');
+          } else {
+            let _err = `Ooooops, I was trying to send a message via web-sockets to channel '${command.channel}', but that channel does not exist!`;
+            log.error(_err);
+          }
+        }
+      });
+    } catch(e) {
+      if (callback) {
+        callback(true, e.message);
+      } else { //Re-throw
+        throw e;
       }
-    });
+      return;
+    }
+  });
 }
 
 exports.getPort = getPort;
@@ -160,3 +191,5 @@ exports.configure = configure;
 exports.Lib = library;
 
 exports.getConnectionsCount = getConnectionsCount;
+
+exports.getChannels = getChannels;

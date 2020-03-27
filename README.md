@@ -57,6 +57,7 @@ npm test
 
 Version History
 ---------------
+* v 0.2.2: (WIP) working on channels, refactored logging code now using a proper library (tracer)
 * v 0.2.1: (WIP) creating channels (starting with ping channel)
 * v 0.2.0: Starting to implement more complex pre-defined core functions ran from libraries instead of direct terminal commands (WIP); created node-cmd wrapper for simplifying issuing terminal commands.
 * v 0.1.11: Implementing handling of clients which do not specify protocol, before it was crashing the server.

@@ -1,6 +1,6 @@
 {
   "name": "journal.io",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "An external (non homebridge) simple logs web-socket",
   "main": "index.js",
   "directories": {
@@ -9,9 +9,13 @@
   "dependencies": {
     "chokidar": "^3.3.1",
     "eventproxy": "^1.0.0",
+    "flatted": "^2.0.1",
+    "flatter": "0.0.0",
     "footprint": "^1.1.0",
+    "minimist": "^1.2.3",
     "node-cmd": "^3.0.0",
     "npm-watch": "^0.6.0",
+    "tracer": "^1.0.2",
     "websocket": "^1.0.31"
   },
   "devDependencies": {
@@ -23,7 +27,7 @@
     "log": "test.logs"
   },
   "scripts": {
-    "test": "mocha --exit",
+    "test": "LOG_LEVEL=info mocha --exit",
     "log": "npm-watch"
   },
   "repository": {
