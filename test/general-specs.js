@@ -83,7 +83,7 @@ describe("Considering a socket server,", function() {
       clientData.ttl.should.be.gt(0);
       done();
     }
-    client.connect(server.getEndpoint() , 'echo-protocol');
+    client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
     setTimeout(() => {
       server.sendServerOutput({
         lib: "ping",
@@ -94,7 +94,7 @@ describe("Considering a socket server,", function() {
   });
 
   it("Should be able get the number of active connections", function (done) {
-    server.getConnectionsCount().should.be.gt(1);
+    server.getConnectionsCount().should.be.gt(0);
     console.log(`  > TEST: current connections: ${server.getChannels()}`);
     done();
   });

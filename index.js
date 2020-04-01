@@ -140,7 +140,7 @@ exports.serverSend = (data, channel = '/') => {
 }
 
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
-  //console.log(`Called cmd '${command}'...!`);
+  log.debug(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
   let fn = typeof command == "string" ? cmd.do : libraryCommand;
   fn(command, (dataToSend) => {
     log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
@@ -155,14 +155,15 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
             callback(false, output);
           }, 1);
         }
-        log.info(`SOCKET: sendUTF event to channel '${command.channel}'?`);
-        log.debug(`${send}, '${command.channel}', ${connections[command.channel]}`);
+        let _channel = `${command.channel}` == 'undefined' ? '/' : `/${command.channel}`;
+        log.info(`SOCKET: sendUTF event to channel '${_channel}'?`);
+        log.debug(`${send}, '${_channel}', ${connections[_channel]}`);
         if(send) {
-          if(connections[command.channel]) {
-            connections[command.channel].sendUTF(output);
+          if(connections[_channel]) {
+            connections[_channel].sendUTF(output);
             log.info('sent info via socket to channel');
           } else {
-            let _err = `Ooooops, I was trying to send a message via web-sockets to channel '${command.channel}', but that channel does not exist!`;
+            let _err = `Ooooops, I was trying to send a message via web-sockets to channel '${_channel}', but that channel does not exist!`;
             log.error(_err);
           }
         }
