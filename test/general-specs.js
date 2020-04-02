@@ -10,6 +10,7 @@ let server = require("../index.js");
 const chokidar = require('chokidar');
 let WebSocketClient = require('websocket').client; 
 let client = new WebSocketClient();
+client.__name = "default";
 let conn;
 let callback;
 
@@ -101,11 +102,15 @@ describe("Considering a socket server,", function() {
 
   it("Should not be able to listen to 'ping' url, when message was sent from root url", function (done) {
     this.timeout(4000);
-    callback = (clientData) => {
+    //Create another totally different client
+    let client2 = new WebSocketClient();
+    client2.__name = "client2";
+    setup(client2, (clientData, source) => {
+      client2.should.be.eql(source);
       clientData.trim().should.eql('PING');
       should.fail();
-    }
-    client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
+    });
+    client2.connect(server.getEndpoint() + '/ping', 'echo-protocol');
     setTimeout(() => {
       server.sendServerOutput('echo PING');
     }, 100);
@@ -114,23 +119,31 @@ describe("Considering a socket server,", function() {
 });
 
 //helper functions
-client.on('connectFailed', function(error) {
+function setup(_client, _callback) {
+  _client.on('connectFailed', function(error) {
     console.log('  > TEST (client): Connect Error: ' + error.toString());
-});
+  });
  
-client.on('connect', function(connection) {
-    console.log('  > TEST (client): Client Connected!');
+  _client.on('connect', function(connection) {
+    console.log(`  > TEST (client::${_client.__name}): Client Connected!`);
     conn = connection;
     connection.on('error', function(error) {
-        console.log("  > TEST (client): Connection Error: " + error.toString());
+        console.log(`  > TEST (client::${_client.__name}): Connection Error: ` + error.toString());
     });
     connection.on('close', function() {
-        console.log('  > TEST (client): echo-protocol Connection Closed');
+        console.log(`  > TEST (client::${_client.__name}): echo-protocol Connection Closed`);
     });
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
-            console.log(`  > TEST (client): Received: "${message.utf8Data}", returning to callback now...`);
-            callback(message.utf8Data);
+            console.log(`  > TEST (client::${_client.__name}) Received: "${message.utf8Data}", returning to callback now...`);
+            if(!_callback) {
+                callback(message.utf8Data, _client);
+            }else {
+                _callback(message.utf8Data, _client);
+            }
         }
     });
-});
+  });
+}
+
+setup(client);

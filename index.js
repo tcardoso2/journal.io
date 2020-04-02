@@ -111,6 +111,8 @@ var configure = () => {
     
     log.info('Connection accepted.');
     connection.on('message', function(message) {
+      log.debug(`Called function with args: "${message}`);
+      log.info(`Connection (resource name: ${connection.__resource} received a message!`);
       if (message.type === 'utf8') {
         log.info('Received Message: ' + message.utf8Data);
         connection.sendUTF(message.utf8Data);
@@ -124,6 +126,8 @@ var configure = () => {
       log.info(' Peer ' + connection.remoteAddress + ' disconnected.');
     });
     connections[request.resource] = connection;
+    //Add a reverse reference on the connection
+    connections[request.resource].__resource = request.resource;
   });
 }
 //internal functions
@@ -161,7 +165,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
         if(send) {
           if(connections[_channel]) {
             connections[_channel].sendUTF(output);
-            log.info('sent info via socket to channel');
+            log.info(`sent info via socket to channel '${_channel}'`);
           } else {
             let _err = `Ooooops, I was trying to send a message via web-sockets to channel '${_channel}', but that channel does not exist!`;
             log.error(_err);

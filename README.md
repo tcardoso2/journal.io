@@ -57,6 +57,7 @@ npm test
 
 Version History
 ---------------
+* v 0.2.4: (WIP) bug fixes for working with 2 paralell channels
 * v 0.2.3: (WIP) bug fixes for channels
 * v 0.2.2: (WIP) working on channels, refactored logging code now using a proper library (tracer)
 * v 0.2.1: (WIP) creating channels (starting with ping channel)
