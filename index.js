@@ -6,7 +6,7 @@ var cmd = require('./lib/command');
 var connections = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
-
+console.log(process.env)
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 var log = require('./lib/utils.js').setLevel(LOG_LEVEL);

@@ -49,7 +49,7 @@ server.sendServerOutput({
 ```
 * Existing library / commands:
 - ping / pingOne: Pings one IP (equivalent to sending ping command over terminal). Right now this is only used for testing purposes and it pings localhost;
-- ping / pingAll: Pings all nodes in the "192.186.0.xxx" space. Beware to only use this on your controlled network environments.
+- ping / pingAll: Pings all nodes in the "192.168.0.xxx" space. Beware to only use this on your controlled network environments.
 Returns a list of nodes in the network;
 
 
@@ -88,7 +88,7 @@ Inside the "lib" folder there are 2 socket clients which you can use if you want
 * HTML client (Javascript): mock.html
 
 Tests (mocha)
------
+-------------
 Just run 
 ```
 mocha --exit
@@ -96,6 +96,17 @@ mocha --exit
 Or
 ```
 npm test
+```
+
+Log level
+---------
+If for some reason you need to change the log level when you are running your script use LOG_LEVEL environment variable like so:
+```
+LOG_LEVEL=debug node your_script_using_journal.io
+
+# Mocha
+
+LOG_LEVEL=debug mocha --exit
 ```
 
 Version History
