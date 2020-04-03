@@ -6,12 +6,12 @@ var cmd = require('./lib/command');
 var connections = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
-console.log(process.env)
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 var log = require('./lib/utils.js').setLevel(LOG_LEVEL);
 
 log.info(` Default port: ${DEFAULT_PORT}`);
+log.info(process.env)
 
 var server;
 
@@ -183,6 +183,8 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
     }
   });
 }
+
+exports.setCommandTimeout = (t) => cmd.setTimeout(t); 
 
 exports.getPort = getPort;
 

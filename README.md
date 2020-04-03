@@ -35,7 +35,17 @@ server.start(() => {
 ```
 This terminal command will send log changes when they happen to the file 'somelogfile.log'.
 Then you can connect via web-sockets client (see examples referenced below).
-
+NOTE: any command has a default timeout of 10 seconds. Meaning even the command above would not receive any more updates after 10 seconds. To override that time use:
+```
+//Override the default timeout for commands
+server.setCommandTimeout(ms);
+// then issue your command
+server.sendServerOutput(`tail -f somelogfile.log`);
+```
+Or alternatively if you want no default timeout:
+```
+server.setCommandTimeout(0);
+```
 
 Library Functions
 -----------------
@@ -111,6 +121,7 @@ LOG_LEVEL=debug mocha --exit
 
 Version History
 ---------------
+* v 0.2.6: Allowing override of command timeout (Default is 10 seconds);
 * v 0.2.5: implemented paralell channels; 
 * v 0.2.4: (WIP) bug fixes for working with 2 paralell channels
 * v 0.2.3: (WIP) bug fixes for channels
