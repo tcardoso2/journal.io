@@ -29,9 +29,52 @@ server.setPort(8054); //If you want to override the default websocket port (8068
 server.configure();
 server.start(() => {
   server.sendServerOutput(`tail -f somelogfile.log`);
+  //To send instead a message to another channel
+});
+
+```
+This terminal command will send log changes when they happen to the file 'somelogfile.log'.
+Then you can connect via web-sockets client (see examples referenced below).
+
+
+Library Functions
+-----------------
+Instead of issuing a command to the server you can also use a list of pre-defined libraries and functions like so:
+```
+server.sendServerOutput({
+  lib: "ping",       //Name of the js library
+  func: "pingOne",   //Function
+  channel: "ping"    //Optional, channel where to send the output to (see Channels, below)
 });
 ```
-Then you can connect via web-sockets client (see examples referenced below)
+* Existing library / commands:
+- ping / pingOne: Pings one IP (equivalent to sending ping command over terminal). Right now this is only used for testing purposes and it pings localhost;
+- ping / pingAll: Pings all nodes in the "192.186.0.xxx" space. Beware to only use this on your controlled network environments.
+Returns a list of nodes in the network;
+
+
+Extending with your own functions
+---------------------------------
+Right now I have not really thought well about this but I plan to include it in the near future.
+
+Channels
+--------
+Channels are just different URLs for the client to point to, e.g.:
+```
+var server = require('journal.io');
+var WebSocketClient = require('websocket').client;
+var client = new WebSocketClient();
+
+client.connect(server.getEndpoint() + '/channel1', 'echo-protocol');
+//Sending a message to any client listening to channel1
+server.sendServerOutput({
+  lib: "ping",
+  func: "pingOne",
+  channel: "channel1"
+});
+```
+This means you can have the same server working on different tasks and sending the output to different clients.
+Right now channels are only possible to use with Library functions (not raw commands).
 
 Rules (WIP)
 -----------
@@ -57,6 +100,7 @@ npm test
 
 Version History
 ---------------
+* v 0.2.5: implemented paralell channels; 
 * v 0.2.4: (WIP) bug fixes for working with 2 paralell channels
 * v 0.2.3: (WIP) bug fixes for channels
 * v 0.2.2: (WIP) working on channels, refactored logging code now using a proper library (tracer)

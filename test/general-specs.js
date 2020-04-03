@@ -79,7 +79,15 @@ describe("Considering a socket server,", function() {
   it("Should be able to listen to 'ping', as a result of a library function call", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
-      clientData = JSON.parse(clientData);
+      try {
+        clientData = JSON.parse(clientData);
+      } catch(e) {
+        if(e instanceof SyntaxError) {
+          //ignore
+          return;
+          throw e;
+        }
+      }
       (clientData.error == null).should.eql(true);
       clientData.ttl.should.be.gt(0);
       done();
