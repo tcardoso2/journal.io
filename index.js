@@ -125,9 +125,10 @@ var configure = () => {
     connection.on('close', function(reasonCode, description) {
       log.info(' Peer ' + connection.remoteAddress + ' disconnected.');
     });
-    connections[request.resource] = connection;
+    let _resource = request.resource ? request.resource : '/';
+    connections[_resource] = connection;
     //Add a reverse reference on the connection
-    connections[request.resource].__resource = request.resource;
+    connections[_resource].__resource = _resource;
   });
 }
 //internal functions
