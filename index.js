@@ -186,6 +186,8 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
 
 exports.setCommandTimeout = (t) => cmd.setTimeout(t); 
 
+exports.setCommandLines = (n) => cmd.setLines(n);
+
 exports.getPort = getPort;
 
 exports.setPort = setPort;

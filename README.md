@@ -121,8 +121,8 @@ LOG_LEVEL=debug mocha --exit
 
 Version History
 ---------------
-* v 0.2.7: (TODO) Limit of lines also needs to be overriden (work on that next);
-* v 0.2.6: Allowing override of command timeout (Default is 10 seconds);
+* v 0.2.7: Limit of lines also now allowed to override via "ignoreLines(true)";
+* v 0.2.6: Allowing override of command timeout "setCommandTimeout" (Default is 10 seconds);
 * v 0.2.5: implemented paralell channels; 
 * v 0.2.4: (WIP) bug fixes for working with 2 paralell channels
 * v 0.2.3: (WIP) bug fixes for channels
