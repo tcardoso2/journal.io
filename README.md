@@ -121,6 +121,7 @@ LOG_LEVEL=debug mocha --exit
 
 Version History
 ---------------
+* v 0.2.8: Dockerizing app (WIP);
 * v 0.2.7: Limit of lines also now allowed to override via "ignoreLines(true)";
 * v 0.2.6: Allowing override of command timeout "setCommandTimeout" (Default is 10 seconds);
 * v 0.2.5: implemented paralell channels; 

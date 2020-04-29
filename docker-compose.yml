@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  journal_io:
+    image: tcardoso2/journal.io:latest
+    ports:
+      - 8069:8068
+    container_name: journal.io
+    restart: always
+    #volumes:
+    #  - ./disk:/home/docker/journal.io/disk
+
