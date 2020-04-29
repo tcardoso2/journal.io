@@ -6,7 +6,8 @@ services:
     ports:
       - 8069:8068
     container_name: journal.io
-    restart: always
-    #volumes:
-    #  - ./disk:/home/docker/journal.io/disk
+    #restart: always
+    volumes:
+      - ./logs:/home/docker/journal.io/logs
+      - .startup.sh:/home/docker/journal.io/startup.sh
 

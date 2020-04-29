@@ -1,3 +1,4 @@
+
 # Dockerfile
 # Journal.io
 # Author: Tiago Cardoso
@@ -29,4 +30,4 @@ COPY --chown=node:node . .
 EXPOSE 8068
 
 # main command
-ENTRYPOINT ["/bin/sh", "-c", "./startup.sh"]
+CMD ["/bin/sh", "./startup.sh"]
