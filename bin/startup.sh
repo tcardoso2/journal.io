@@ -4,4 +4,4 @@
 # Custom start script
 #
 echo "============================  Starting JOURNAL.io  ============================"
-LOG_SOCKET_PORT=8068 node server.js
+node ./bin/server.js > ./logs/journal.io.log

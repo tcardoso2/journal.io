@@ -119,8 +119,13 @@ LOG_LEVEL=debug node your_script_using_journal.io
 LOG_LEVEL=debug mocha --exit
 ```
 
+Docker
+------
+(Add info)
+
 Version History
 ---------------
+* v 0.2.9: First docker version, will add instructions later;
 * v 0.2.8: Dockerizing app (WIP);
 * v 0.2.7: Limit of lines also now allowed to override via "ignoreLines(true)";
 * v 0.2.6: Allowing override of command timeout "setCommandTimeout" (Default is 10 seconds);

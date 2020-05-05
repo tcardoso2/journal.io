@@ -26,8 +26,10 @@ RUN npm install
 # Copy journal.io application code with the appropriate permissions to 
 # the application directory on the container:
 COPY --chown=node:node . .
+VOLUME ["/home/node/journal.io/logs", "/home/node/journal.io/bin", "/home/node/journal.io/target"]
 
 EXPOSE 8068
+EXPOSE 8084
 
 # main command
-CMD ["/bin/sh", "./startup.sh"]
+CMD ["/bin/sh", "./bin/startup.sh"]
