@@ -139,8 +139,9 @@ function originIsAllowed(origin) {
 
 //Public exports
 
-exports.serverSend = (data, channel = '/') => {
-  log.info(`Sending data: connection '${channel}' is active? ${connections[channel].connected}`);
+exports.serverSend = (data, channel = '/main') => {
+  let _isActive = connections[channel] && connections[channel].connected;
+  log.info(`Sending data: connection '${channel}' is active? ${_isActive}`);
   connections[channel].sendUTF(data);
 }
 
@@ -160,7 +161,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
             callback(false, output);
           }, 1);
         }
-        let _channel = `${command.channel}` == 'undefined' ? '/' : `/${command.channel}`;
+        let _channel = `${command.channel}` == 'undefined' ? '/main' : command.channel;
         log.info(`SOCKET: sendUTF event to channel '${_channel}'?`);
         log.debug(`${send}, '${_channel}', ${connections[_channel]}`);
         if(send) {

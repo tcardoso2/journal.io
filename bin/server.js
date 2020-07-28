@@ -1,6 +1,8 @@
 //let main = require('../../journal.io/index.js');
 let server = require('../index');
 let http = require('http');
+let config = require('../config.json');
+
 const API_PORT = process.env.API_PORT || 8084;
 
 //
@@ -35,7 +37,7 @@ function startServer() {
       channel: "ping"
     })*/
     //For the next command I want to disable the timeout
-    server.sendServerOutput('tail -f ./target');
+    server.sendServerOutput(config.command); //'tail -f ./target');
   });
 }
 

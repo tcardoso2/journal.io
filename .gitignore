@@ -102,3 +102,11 @@ dist
 
 # TernJS port file
 .tern-port
+
+# config.json file, example below, timeout is in milliseconds, -1 means never expires:
+#{
+#  "command": "tail -f /my/logs/path",
+#    "timeout": -1
+#}
+#
+config.json
