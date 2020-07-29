@@ -94,6 +94,7 @@ var configure = () => {
   wsServer.on('request', function(request) {
     log.debug(`Called function with args: "${request}`);
     log.info(' Requesting connection to channel: ' + request.resource);
+    log.info(`Current Server connections: ${wsServer.connections.length}`);
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin
       request.reject();
@@ -110,6 +111,7 @@ var configure = () => {
     }
     
     log.info('Connection accepted.');
+    log.info(`Current Server connections: ${wsServer.connections.length}`);
     connection.on('message', function(message) {
       log.debug(`Called function with args: "${message}`);
       log.info(`Connection (resource name: ${connection.__resource} received a message!`);
@@ -123,7 +125,12 @@ var configure = () => {
       }
     });
     connection.on('close', function(reasonCode, description) {
-      log.info(' Peer ' + connection.remoteAddress + ' disconnected.');
+      connection.sendUTF("Server received close event...");
+      log.warn(` Peer ${connection.remoteAddress} with resource name: ${connection.__resource} disconnected.`);
+      delete connections[_resource];
+      log.debug(wsServer);
+      connection.close();
+      log.warn(`Closing connection. Current Server connections: ${wsServer.connections.length}`);
     });
     let _resource = request.resource ? request.resource : '/';
     connections[_resource] = connection;
