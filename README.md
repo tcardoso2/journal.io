@@ -125,6 +125,7 @@ Docker
 
 Version History
 ---------------
+* v 0.3.1: Adding start, status and stop scripts (Backend job)
 * v 0.3.0: Bug fixes, added config.json file. timeout = -1 means the command never times out;
 * v 0.2.9: First docker version, will add instructions later;
 * v 0.2.8: Dockerizing app (WIP);
