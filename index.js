@@ -9,11 +9,13 @@ var processRules = require('./lib/ruleProcessor').process;
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 var log = require('./lib/utils.js').setLevel(LOG_LEVEL);
+let config = require('./config.json');
 
 log.info(` Default port: ${DEFAULT_PORT}`);
 log.info(process.env)
 
 var server;
+var lastPref; //Last process refence which gets ran via node-cmd
 
 var library = (name) => {
   log.debug(`Called function with args: "${name}"`);
@@ -77,7 +79,7 @@ var configure = () => {
   log.debug(`Called function`);
   let connection;
   server = http.createServer((request, response) => {
-    logi.info(' Received request for ' + request.url);
+    log.info(' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
   });
@@ -125,7 +127,7 @@ var configure = () => {
       }
     });
     connection.on('close', function(reasonCode, description) {
-      connection.sendUTF("Server received close event...");
+      connection.sendUTF(`Server received close event with reason code ${reasonCode} and description ${description}...`);
       log.warn(` Peer ${connection.remoteAddress} with resource name: ${connection.__resource} disconnected.`);
       delete connections[_resource];
       log.debug(wsServer);
@@ -137,7 +139,52 @@ var configure = () => {
     //Add a reverse reference on the connection
     connections[_resource].__resource = _resource;
   });
+  setupHeartBeat();
 }
+
+function setupHeartBeat() {
+  if(config.heartbeat && config.heartbeat.on) {
+    let _heartBeatCount = 0;
+    log.info("Setting up Heartbeat...");
+    let _interval = config.heartbeat.every || 10000;
+    setInterval(() => {
+      _heartBeatCount++;
+      log.info(`Sending heartbeat #${_heartBeatCount} to clients...`);
+      for(var conn in wsServer.connections) {
+        wsServer.connections[conn].sendUTF(`[Heartbeat from server] Last process status:\
+ connected: ${lastPref.connected},\
+ signalCode: ${lastPref.signalCode},\
+ exitCode: ${lastPref.exitCode},\
+ killed: ${lastPref.killed},\
+ beat: ${_heartBeatCount},\
+ timed-out: ${lastPref.timedOut}`);
+        log.debug(lastPref);
+        if(lastPref.killed) {
+          log.error(`Oh no! The underlying process was killed (pid: ${lastPref.pid})`);
+          log.debug(lastPref);
+        }
+      }
+    }, _interval);
+  }
+}
+
+function setupProcessErrorHandling() {
+  if(config.processErrorHandling && config.processErrorHandling.on) {
+    if(lastPref) {
+      log.info("Setting up Process Error Handling...");
+      lastPref.on('close', (exitCode, signalCode) => {
+        log.error(`Last Process Closed: ${exitCode}, ${signalCode}, will respawn it...`);
+        //Attempting retry?
+        let _command = lastPref.spawnargs[2];
+        exports.sendServerOutput(_command);
+      });
+      lastPref.on('error', (arg1, arg2, arg3) => {
+        log.error(`Last Process Error: ${arg1}, ${arg2}, ${arg3}`);
+      });
+    }
+  } 
+}
+
 //internal functions
 function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed.
@@ -155,7 +202,7 @@ exports.serverSend = (data, channel = '/main') => {
 exports.sendServerOutput = (command, rules = [], callback, send = true) => {
   log.debug(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
   let fn = typeof command == "string" ? cmd.do : libraryCommand;
-  fn(command, (dataToSend) => {
+  lastPref = fn(command, (dataToSend) => {
     log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
     try{
       log.info('Received output, initiating rules processing...');
@@ -176,7 +223,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
             connections[_channel].sendUTF(output);
             log.info(`sent info via socket to channel '${_channel}'`);
           } else {
-            let _err = `Ooooops, I was trying to send a message via web-sockets to channel '${_channel}', but that channel does not exist!`;
+            let _err = `Trying to send message to channel '${_channel}', but that channel does not exist!`;
             log.error(_err);
           }
         }
@@ -190,6 +237,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
       return;
     }
   });
+  setupProcessErrorHandling();
 }
 
 exports.setCommandTimeout = (t) => cmd.setTimeout(t); 

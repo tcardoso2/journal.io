@@ -37,7 +37,7 @@ function startServer() {
       channel: "ping"
     })*/
     //For the next command I want to disable the timeout
-    server.sendServerOutput(config.command); //'tail -f ./target');
+    server.sendServerOutput(config.command);
   });
 }
 
