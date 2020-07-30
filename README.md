@@ -123,8 +123,16 @@ Docker
 ------
 (Add info)
 
+Config.json
+-----------
+The application has a ./config.json which allow enabling several features:
+* logging
+* heartbeat
+* processErrorHandling 
+
 Version History
 ---------------
+* v 0.3.4: Changed configuration to allow several files to be monitored and to separate command from target
 * v 0.3.3: Implementing logging level changes on the fly (e.g. no need to restart application);
 * v 0.3.2: Added support to log into a different file (WIP), added heartbeat configuraiton option, fixed process being killed after a while by respawning the process;
 * v 0.3.1: Adding start, status and stop scripts (Backend job)

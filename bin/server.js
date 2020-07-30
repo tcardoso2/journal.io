@@ -2,6 +2,7 @@
 let server = require('../index');
 let http = require('http');
 let config = require('../config.json');
+let targetItem = 0; //Default target file to monitor from the array
 
 const API_PORT = process.env.API_PORT || 8084;
 
@@ -36,7 +37,8 @@ function startServer() {
       channel: "ping"
     })*/
     //For the next command I want to disable the timeout
-    server.sendServerOutput(config.command);
+    let target = config.target[targetItem];
+    server.sendServerOutput(`${config.command} ${target}`);
   });
 }
 
