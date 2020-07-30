@@ -125,6 +125,7 @@ Docker
 
 Version History
 ---------------
+* v 0.3.3: Implementing logging level changes on the fly (e.g. no need to restart application);
 * v 0.3.2: Added support to log into a different file (WIP), added heartbeat configuraiton option, fixed process being killed after a while by respawning the process;
 * v 0.3.1: Adding start, status and stop scripts (Backend job)
 * v 0.3.0: Bug fixes, added config.json file. timeout = -1 means the command never times out;

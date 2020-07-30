@@ -10,7 +10,6 @@ const API_PORT = process.env.API_PORT || 8084;
 
 function startWebServer() {
   http.createServer((req, res) => {
-
     if (req.method == "GET") {
       res.writeHead(200, { "Content-type": "text/json" });
       if(req.url == "/reset") {
