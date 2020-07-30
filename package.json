@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "chokidar": "^3.3.1",
+    "dot-prop": "^5.2.0",
     "eventproxy": "^1.0.0",
     "flatted": "^2.0.2",
     "flatter": "0.0.0",
