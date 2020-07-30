@@ -8,6 +8,6 @@ FILE=./process.pid
 if [ -f "$FILE" ]; then
   echo "Journal.io is running currently with process id: `cat ${FILE}`"
 else 
-    echo "Journal.io is not running"
+  echo "Journal.io is not running"
 fi
 
