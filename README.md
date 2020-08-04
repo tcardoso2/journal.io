@@ -132,6 +132,10 @@ The application has a ./config.json which allow enabling several features:
 
 Version History
 ---------------
+* v 0.3.5: 
+  - (WIP) Creating monitor to look at principal command task since it seems to be timing out unexpectably
+  - Revisiting test suites, as I haven't looked into them for a while
+  - Created onConnect callback, after the server receives a successful connection, instead of having hard-coded timeouts.
 * v 0.3.4: Changed configuration to allow several files to be monitored and to separate command from target
 * v 0.3.3: Implementing logging level changes on the fly (e.g. no need to restart application);
 * v 0.3.2: Added support to log into a different file (WIP), added heartbeat configuraiton option, fixed process being killed after a while by respawning the process;

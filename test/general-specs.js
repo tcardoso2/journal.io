@@ -15,6 +15,7 @@ let conn;
 let callback;
 
 before(function(done) {
+  server.closeLog(); //Remove excess of verbosity to allow seeing better the test results
   server.configure();
   server.start((a) => {
     done();
@@ -53,15 +54,16 @@ describe("Considering a socket server,", function() {
   });
 
   it("A client should receive a message pushed by the server (trigger)", function (done) {
+    this.timeout(4000);
     callback = (clientData) => {
       clientData.should.equal("Message from server!!!");
       done();
     }
     
     client.connect(server.getEndpoint(), 'echo-protocol');
-    setTimeout(() => {
-      server.serverSend("Message from server!!!");
-    }, 100);
+    server.onConnect((connection) => {
+      server.serverSend("Message from server!!!", connection.__resource);
+    });
   });
 
   it("Should be able to listen to changes on stdout from a command", function (done) {
@@ -146,7 +148,7 @@ function setup(_client, _callback) {
             console.log(`  > TEST (client::${_client.__name}) Received: "${message.utf8Data}", returning to callback now...`);
             if(!_callback) {
                 callback(message.utf8Data, _client);
-            }else {
+            } else {
                 _callback(message.utf8Data, _client);
             }
         }

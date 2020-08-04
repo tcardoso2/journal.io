@@ -8,11 +8,15 @@ var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
-var log = require('./lib/utils.js').setLevel(LOG_LEVEL);
+let utils = require('./lib/utils.js');
+let log = utils.setLevel(LOG_LEVEL);
 let config = require('./config.json');
 
-log.info(` Default port: ${DEFAULT_PORT}`);
-log.info(process.env)
+//Event default callbacks
+let _onConnectFn = () => {};
+
+log.debug(` Default port: ${DEFAULT_PORT}`);
+log.debug(process.env);
 
 var server;
 var lastPref; //Last process refence which gets ran via node-cmd
@@ -138,6 +142,8 @@ var configure = () => {
     connections[_resource] = connection;
     //Add a reverse reference on the connection
     connections[_resource].__resource = _resource;
+    //If it reaches this point means the request is successful, callback now
+    _onConnectFn(connections[_resource]);
   });
   setupHeartBeat();
 }
@@ -150,6 +156,10 @@ function setupHeartBeat() {
     setInterval(() => {
       _heartBeatCount++;
       log.info(`Sending heartbeat #${_heartBeatCount} to clients...`);
+      if(!lastPref) {
+        log.warn("Background running process does not exist, will skip heartbeat. This is ok if you are just testing");
+        return;
+      }
       for(var conn in wsServer.connections) {
         wsServer.connections[conn].sendUTF(`[Heartbeat from server] Last process status:\
  connected: ${lastPref.connected},\
@@ -196,6 +206,9 @@ function originIsAllowed(origin) {
 exports.serverSend = (data, channel = '/main') => {
   let _isActive = connections[channel] && connections[channel].connected;
   log.info(`Sending data: connection '${channel}' is active? ${_isActive}`);
+  if(!_isActive) {
+    throw new Error(`Channel named '${channel} is not connected, cannot send message to socket client.'`);
+  }
   connections[channel].sendUTF(data);
 }
 
@@ -259,3 +272,10 @@ exports.Lib = library;
 exports.getConnectionsCount = getConnectionsCount;
 
 exports.getChannels = getChannels;
+
+exports.setLogLevel = (level = LOG_LEVEL) => utils.setLevel(level);
+
+exports.closeLog = () => utils.closeLog();
+
+// Main Callbacks
+exports.onConnect = (fn) => _onConnectFn = fn;
