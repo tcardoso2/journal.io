@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "chokidar": "^3.3.1",
+    "dot-prop": "^5.2.0",
     "eventproxy": "^1.0.0",
     "flatted": "^2.0.2",
     "flatter": "0.0.0",
@@ -19,9 +20,10 @@
     "websocket": "^1.0.31"
   },
   "devDependencies": {
-    "mocha": "^7.0.0",
     "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1"
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^7.5.0",
+    "mocha": "^7.0.0"
   },
   "watch": {
     "log": "test.logs"

@@ -20,8 +20,9 @@ any command and capture it's output.
 ```
 npm install journal.io
 ```
+Then create a config.json file (WIP). See below an example.
 
-* Simple example usage (Server):
+* Simple example usage (API) (Server):
 ```
 let server = require('journal.io');
 
@@ -122,13 +123,29 @@ LOG_LEVEL=debug mocha --exit
 Docker
 ------
 (Add info)
+Note: Currently I'm working on this.
+
+Documentation
+-------------
+Documentation is generated via the npm 'documentation' package. To re-generate documentation do
+````
+./bin/doc.sh
+````
 
 Config.json
 -----------
-The application has a ./config.json which allow enabling several features:
+The application requires a ./config.json file (in the root of the project folder) which allow enabling several features:
 * logging
 * heartbeat
 * processErrorHandling 
+This file is mandatory, and it has not been included in the source code repository, therefore you need to create it manually. A minimal example is below:
+````
+{
+    "target": [
+        "/path/to/your/file"
+    ]
+}
+````
 
 Version History
 ---------------
@@ -136,7 +153,12 @@ Version History
   - (WIP) Creating monitor to look at principal command task since it seems to be timing out unexpectably
   - Revisiting test suites, as I haven't looked into them for a while
   - Created onConnect callback, after the server receives a successful connection, instead of having hard-coded timeouts.
-* v 0.3.4: Changed configuration to allow several files to be monitored and to separate command from target
+* v 0.3.4: Changed configuration to allow several files to be monitored and to separate command from target. Started documentation (via npm documentation package). Created dev-dependency to eslint (WIP)
+  * Issues:
+    * mocha tests are failing for this release, only did some basic manual regression testing
+    * config.json has to be done manually. an improvement should be to have that as a command
+    * Linting must be still initialized via
+    ````./node_modules/.bin/eslint --init````
 * v 0.3.3: Implementing logging level changes on the fly (e.g. no need to restart application);
 * v 0.3.2: Added support to log into a different file (WIP), added heartbeat configuraiton option, fixed process being killed after a while by respawning the process;
 * v 0.3.1: Adding start, status and stop scripts (Backend job)

@@ -7,6 +7,13 @@ var connections = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+/**
+ * Default port which the Journal.io application runs on.
+ * If a environment variable LOG_SOCKET_PORT exists, it will
+ * default to that value, otherwise defaults to 8068.
+ * @default 8068
+ * @private
+ */
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 let utils = require('./lib/utils.js');
 let log = utils.setLevel(LOG_LEVEL);
@@ -196,6 +203,7 @@ function setupProcessErrorHandling() {
 }
 
 //internal functions
+
 function originIsAllowed(origin) {
   // put logic here to detect whether the specified origin is allowed.
   return true;
@@ -253,12 +261,30 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
   setupProcessErrorHandling();
 }
 
+/**
+ * Overrides the default timeout of the command used for journal.io, 
+ * which is defined in config.json or if not defined, defaults to
+ * DEFAULT_TIMEOUT
+ * @see DEFAULT_TIMEOUT
+ * @param {number} t timeout in milliseconds
+ * @public
+ */
 exports.setCommandTimeout = (t) => cmd.setTimeout(t); 
 
 exports.ignoreLines = (b) => cmd.ignoreLines(b);
-
+/**
+ * Gets the port which the journal.js http server runs in
+ * @see DEFAULT_TIMEOUT
+ * @public
+ */
 exports.getPort = getPort;
 
+/**
+ * Gets the port which the journal.js http server runs in
+ * @see DEFAULT_TIMEOUT
+ * @param {number} port a valid port number
+ * @public
+ */
 exports.setPort = setPort;
 
 exports.getEndpoint = () => `ws://localhost:${getPort()}`;

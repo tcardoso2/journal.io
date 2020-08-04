@@ -37,6 +37,10 @@ function startServer() {
       channel: "ping"
     })*/
     //For the next command I want to disable the timeout
+    if(!config || !config.target) 
+    {
+      throw new Error("To run the application please define a config.json file with a 'target' attribute which points to the file you want to monitor.");
+    }
     let target = config.target[targetItem];
     server.sendServerOutput(`${config.command} ${target}`);
   });
