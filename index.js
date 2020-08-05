@@ -123,7 +123,7 @@ var configure = () => {
       return;
     }
     
-    log.info('Connection accepted.');
+    log.info(`Connection to '${request.resource}' accepted.`);
     log.info(`Current Server connections: ${wsServer.connections.length}`);
     connection.on('message', function(message) {
       log.debug(`Called function with args: "${message}`);
@@ -220,7 +220,7 @@ exports.serverSend = (data, channel = '/main') => {
   connections[channel].sendUTF(data);
 }
 
-exports.sendServerOutput = (command, rules = [], callback, send = true) => {
+exports.sendServerOutput = (command, rules = [], callback, send = true, defaultChannel = '/main') => {
   log.debug(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
   let fn = typeof command == "string" ? cmd.do : libraryCommand;
   lastPref = fn(command, (dataToSend) => {
@@ -236,9 +236,10 @@ exports.sendServerOutput = (command, rules = [], callback, send = true) => {
             callback(false, output);
           }, 1);
         }
-        let _channel = `${command.channel}` == 'undefined' ? '/main' : command.channel;
+        let _channel = `${command.channel}` == 'undefined' ? defaultChannel : command.channel;
         log.info(`SOCKET: sendUTF event to channel '${_channel}'?`);
         log.debug(`${send}, '${_channel}', ${connections[_channel]}`);
+        log.debug(`Existing connections: ${Object.keys(connections)}`);
         if(send) {
           if(connections[_channel]) {
             connections[_channel].sendUTF(output);

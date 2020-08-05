@@ -15,7 +15,8 @@ let conn;
 let callback;
 
 before(function(done) {
-  server.closeLog(); //Remove excess of verbosity to allow seeing better the test results
+  server.closeLog(); //Remove excess of verbosity to allow seeing better the test results, uncomment line below if you want to set the logging verbosity level
+  //server.setLogLevel('debug');
   server.configure();
   server.start((a) => {
     done();
@@ -28,8 +29,8 @@ after(function(done) {
   done();
 });
 
-describe("Considering a socket server,", function() {
-  it("A client should be able to connect to it", function (done) {
+describe("1. Considering a socket server,", function() {
+  it("  1.1. A client should be able to connect to it", function (done) {
     //Prepare
     this.timeout(4000);
     function sendNumber() {
@@ -53,32 +54,36 @@ describe("Considering a socket server,", function() {
     });
   });
 
-  it("A client should receive a message pushed by the server (trigger)", function (done) {
+  it("  1.2. A client should receive a message pushed by the server (trigger)", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
       clientData.should.equal("Message from server!!!");
       done();
     }
     
-    client.connect(server.getEndpoint(), 'echo-protocol');
     server.onConnect((connection) => {
       server.serverSend("Message from server!!!", connection.__resource);
     });
+    client.connect(server.getEndpoint(), 'echo-protocol');
   });
 
-  it("Should be able to listen to changes on stdout from a command", function (done) {
+  it("  1.3. Should be able to listen to changes on stdout from a command", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
       clientData.trim().should.eql('TEST');
       done();
     }
+    server.onConnect((connection) => {
+      connection.__resource.should.equal("/");
+      server.sendServerOutput('echo TEST', [], (error, output) => {
+        error.should.equal(false);
+        output.trim().should.equal("TEST");
+      }, true, connection.__resource);
+    });
     client.connect(server.getEndpoint(), 'echo-protocol');
-    setTimeout(() => {
-      server.sendServerOutput('echo TEST');
-    }, 100);
   });
 
-  it("Should be able to listen to 'ping', as a result of a library function call", function (done) {
+  it("  1.4. Should be able to listen to 'ping', as a result of a library function call", function (done) {
     this.timeout(4000);
     callback = (clientData) => {
       try {
@@ -94,37 +99,57 @@ describe("Considering a socket server,", function() {
       clientData.ttl.should.be.gt(0);
       done();
     }
+    server.onConnect((connection) => {
+      if(connection.__resource == "/ping") {
+        server.sendServerOutput({
+          lib: "ping",
+          func: "pingOne",
+          channel: "/ping"
+        }, [], (error, output) => {
+          error.should.equal(false);
+          JSON.parse(output).host.should.equal("127.0.0.1");
+        }, true, connection.__resource);
+      } else {
+        //Other channel calls will be ignored
+      }
+    });
     client.connect(server.getEndpoint() + '/ping', 'echo-protocol');
-    setTimeout(() => {
-      server.sendServerOutput({
-        lib: "ping",
-        func: "pingOne",
-        channel: "ping"
-      });
-    }, 100);
   });
 
-  it("Should be able get the number of active connections", function (done) {
+  it("  1.5. Should be able get the number of active connections", function (done) {
     server.getConnectionsCount().should.be.gt(0);
     console.log(`  > TEST: current connections: ${server.getChannels()}`);
     done();
   });
 
-  it("Should not be able to listen to 'ping' url, when message was sent from root url", function (done) {
+  it("  1.6. Client should not be able to listen to 'ping' url, when message was sent from root url", function (done) {
     this.timeout(4000);
     //Create another totally different client
     let client2 = new WebSocketClient();
+    let client3 = new WebSocketClient();
     client2.__name = "client2";
     setup(client2, (clientData, source) => {
       client2.should.be.eql(source);
-      clientData.trim().should.eql('PING');
-      should.fail();
+      if (clientData.trim() == 'PING from /main')
+        should.fail();
+    });
+    let _pingCount = 0;
+    setup(client3, (clientData, source) => {
+      console.log(`"${clientData}"`);
+      //will receive ping twice
+      if (clientData.trim() == 'PING from /main') {
+        _pingCount++;
+        //ok
+        if(_pingCount == 2)
+          done();
+      }
     });
     client2.connect(server.getEndpoint() + '/ping', 'echo-protocol');
-    setTimeout(() => {
-      server.sendServerOutput('echo PING');
-    }, 100);
-    setTimeout(() => { done(); }, 2000)
+    client3.connect(server.getEndpoint() + '/main', 'echo-protocol');
+    server.onConnect((connection) => {
+      //Ping was sent from Root
+      server.sendServerOutput(`echo PING from ${connection.__resource}`);
+    });
   });
 });
 
@@ -138,20 +163,20 @@ function setup(_client, _callback) {
     console.log(`  > TEST (client::${_client.__name}): Client Connected!`);
     conn = connection;
     connection.on('error', function(error) {
-        console.log(`  > TEST (client::${_client.__name}): Connection Error: ` + error.toString());
+      console.log(`  > TEST (client::${_client.__name}): Connection Error: ` + error.toString());
     });
     connection.on('close', function() {
-        console.log(`  > TEST (client::${_client.__name}): echo-protocol Connection Closed`);
+      console.log(`  > TEST (client::${_client.__name}): echo-protocol Connection Closed`);
     });
     connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log(`  > TEST (client::${_client.__name}) Received: "${message.utf8Data}", returning to callback now...`);
-            if(!_callback) {
-                callback(message.utf8Data, _client);
-            } else {
-                _callback(message.utf8Data, _client);
-            }
+      if (message.type === 'utf8') {
+        console.log(`  > TEST (client::${_client.__name}) Received: "${message.utf8Data}", returning to callback now...`);
+        if(!_callback) {
+          callback(message.utf8Data, _client);
+        } else {
+          _callback(message.utf8Data, _client);
         }
+      }
     });
   });
 }
