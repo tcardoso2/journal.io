@@ -1,7 +1,13 @@
+#!/usr/bin/env node
+
 //let main = require('../../journal.io/index.js');
 let server = require('../index');
 let http = require('http');
 let config = require('../config.json');
+
+const { program } = require('commander');
+program.version(config.version);
+
 let targetItem = 0; //Default target file to monitor from the array
 
 const API_PORT = process.env.API_PORT || 8084;
@@ -46,11 +52,26 @@ function startServer() {
   });
 }
 
-try{
-  server.configure();
-  startWebServer();
-  startServer();
-}catch(e){
-  console.log("OOOooops an error occured!");
-  console.error(e);
+program
+  .option('-d, --debug', 'output extra debugging')
+  
+program
+  .command('start')
+  .description('start the server')
+  .action(() => {
+    try{
+      server.configure();
+      startWebServer();
+      startServer();
+    }catch(e){
+      console.log("OOOooops an error occured!");
+      console.error(e);
+    }
+  });
+
+program.parse(process.argv);
+
+if (program.debug) {
+  server.setLogLevel('debug');
 }
+

@@ -172,6 +172,7 @@ function setupHeartBeat() {
  connected: ${lastPref.connected},\
  signalCode: ${lastPref.signalCode},\
  exitCode: ${lastPref.exitCode},\
+ pid: ${lastPref.pid},\
  killed: ${lastPref.killed},\
  beat: ${_heartBeatCount},\
  timed-out: ${lastPref.timedOut}`);

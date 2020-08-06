@@ -149,6 +149,7 @@ This file is mandatory, and it has not been included in the source code reposito
 
 Version History
 ---------------
+* v 0.3.6: kill ends the server.js process but not the underlying processes, need to handle that first, starting process and CLI specs
 * v 0.3.5: 
   - (WIP) Creating monitor to look at principal command task since it seems to be timing out unexpectably
   - Revisiting test suites, as I haven't looked into them for a while

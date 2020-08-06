@@ -1,6 +1,6 @@
 {
   "name": "journal.io",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "An external (non homebridge) simple logs web-socket",
   "main": "index.js",
   "directories": {
@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "chokidar": "^3.3.1",
+    "commander": "^6.0.0",
     "dot-prop": "^5.2.0",
     "eventproxy": "^1.0.0",
     "flatted": "^2.0.2",
