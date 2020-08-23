@@ -138,7 +138,7 @@ The application requires a ./config.json file (in the root of the project folder
 * logging
 * heartbeat
 * processErrorHandling 
-This file is mandatory, and it has not been included in the source code repository, therefore you need to create it manually. A minimal example is below:
+This file is mandatory, but because it might contain sensitive information has not been included in the source code repository, therefore you need to create it manually. A minimal example is below:
 ````
 {
     "target": [
@@ -164,7 +164,7 @@ Version History
 * v 0.3.2: Added support to log into a different file (WIP), added heartbeat configuraiton option, fixed process being killed after a while by respawning the process;
 * v 0.3.1: Adding start, status and stop scripts (Backend job)
 * v 0.3.0: Bug fixes, added config.json file. timeout = -1 means the command never times out;
-* v 0.2.9: First docker version, will add instructions later;
+* v 0.2.9: First docker version, will add instructions later, starting API with 'reset' action which restarts the server;
 * v 0.2.8: Dockerizing app (WIP);
 * v 0.2.7: Limit of lines also now allowed to override via "ignoreLines(true)";
 * v 0.2.6: Allowing override of command timeout "setCommandTimeout" (Default is 10 seconds);
