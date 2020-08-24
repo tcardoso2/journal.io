@@ -1,3 +1,4 @@
+
 # journal.io
 
 ```
@@ -122,8 +123,12 @@ LOG_LEVEL=debug mocha --exit
 
 Docker
 ------
-(Add info)
-Note: Currently I'm working on this.
+You can build a local docker container by running ./bin/build_docker.sh
+It packs the app into the container and tags it with the current npm package version
+Then run it using the docker-compose file on this repo:
+````
+docker-compose up
+````
 
 Documentation
 -------------
@@ -149,6 +154,7 @@ This file is mandatory, but because it might contain sensitive information has n
 
 Version History
 ---------------
+* v 0.3.7: Creating build docker script in ./bin/build_docker.sh
 * v 0.3.6: kill ends the server.js process but not the underlying processes, need to handle that first, starting process and CLI specs
 * v 0.3.5: 
   - (WIP) Creating monitor to look at principal command task since it seems to be timing out unexpectably
