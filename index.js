@@ -122,7 +122,7 @@ var configure = () => {
       log.warn("Server will reject this connection and carry on...");
       return;
     }
-    
+
     log.info(`Connection to '${request.resource}' accepted.`);
     log.info(`Current Server connections: ${wsServer.connections.length}`);
     connection.on('message', function(message) {
@@ -200,7 +200,7 @@ function setupProcessErrorHandling() {
         log.error(`Last Process Error: ${arg1}, ${arg2}, ${arg3}`);
       });
     }
-  } 
+  }
 }
 
 //internal functions
@@ -222,7 +222,7 @@ exports.serverSend = (data, channel = '/main') => {
 }
 
 exports.sendServerOutput = (command, rules = [], callback, send = true, defaultChannel = '/main') => {
-  log.debug(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
+  log.info(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
   let fn = typeof command == "string" ? cmd.do : libraryCommand;
   lastPref = fn(command, (dataToSend) => {
     log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
@@ -264,14 +264,14 @@ exports.sendServerOutput = (command, rules = [], callback, send = true, defaultC
 }
 
 /**
- * Overrides the default timeout of the command used for journal.io, 
+ * Overrides the default timeout of the command used for journal.io,
  * which is defined in config.json or if not defined, defaults to
  * DEFAULT_TIMEOUT
  * @see DEFAULT_TIMEOUT
  * @param {number} t timeout in milliseconds
  * @public
  */
-exports.setCommandTimeout = (t) => cmd.setTimeout(t); 
+exports.setCommandTimeout = (t) => cmd.setTimeout(t);
 
 exports.ignoreLines = (b) => cmd.ignoreLines(b);
 /**
