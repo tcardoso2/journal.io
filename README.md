@@ -154,6 +154,7 @@ This file is mandatory, but because it might contain sensitive information has n
 
 Version History
 ---------------
+* v 0.3.8: Adding support to receive messages from client, added push docker image script to registry
 * v 0.3.7: Creating build docker script in ./bin/build_docker.sh, starting work on CLI tool for interacting with the client (WIP);
 * v 0.3.6: kill ends the server.js process but not the underlying processes, need to handle that first, starting process and CLI specs
 * v 0.3.5: 

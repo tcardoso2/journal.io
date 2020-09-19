@@ -49,6 +49,8 @@ function startServer() {
     }
     let target = config.target[targetItem];
     server.sendServerOutput(`${config.command} ${target}`);
+    //Start the client channel
+    server.sendServerOutput("ls", [], undefined, true, "/client");
   });
 }
 

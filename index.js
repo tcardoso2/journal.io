@@ -227,7 +227,7 @@ exports.sendServerOutput = (command, rules = [], callback, send = true, defaultC
   lastPref = fn(command, (dataToSend) => {
     log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
     try{
-      log.info('Received output, initiating rules processing...');
+      log.info(`Received output ${command}, initiating rules processing...`);
       processRules(dataToSend, rules, (output) => {
         //console.log(data_line);
         if (callback) {
