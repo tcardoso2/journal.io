@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 
-var WebSocketServer = require('websocket').server;
+var WebSocket = require('ws');
+var url = require('url')
 var http = require('http');
 var cmd = require('./lib/command');
 var connections = {};
+var wsservers = {};
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+
+const DEFAULT_CHANNEL = '/main'; //Channel used for the socket communication
+const CLIENT_CHANNEL = '/client'; //Channel used by the client to send messages to server
+
 /**
  * Default port which the Journal.io application runs on.
  * If a environment variable LOG_SOCKET_PORT exists, it will
@@ -86,72 +92,49 @@ var start = (callback) => {
   reset(false, callback);
 }
 
-var configure = () => {
+server = http.createServer()
+
+server.on('upgrade', function upgrade(request, socket, head) {
+  log.debug("Called function");
+
+  const pathname = url.parse(request.url).pathname;
+  log.info(`Request to Path: ${pathname}`);
+  log.info(`Existing connections: ${Object.keys(connections)}...`)
+
+  if(wsservers[pathname]) {
+    wsservers[pathname].handleUpgrade(request, socket, head, function done(ws) {
+      wsservers[pathname].emit('connection', ws, request);
+    });
+  } else {
+    socket.destroy();
+  }
+});
+
+var configure = (channel = DEFAULT_CHANNEL) => {
   log.debug(`Called function`);
-  let connection;
-  server = http.createServer((request, response) => {
-    log.info(' Received request for ' + request.url);
-    response.writeHead(404);
-    response.end();
-  });
+  let wss, connection;
 
-  wsServer = new WebSocketServer({
-    httpServer: server,
-    // You should not use autoAcceptConnections for production
-    // applications, as it defeats all standard cross-origin protection
-    // facilities built into the protocol and the browser.  You should
-    // *always* verify the connection's origin and decide whether or not
-    // to accept it.
-    autoAcceptConnections: false
-  });  
-  wsServer.on('request', function(request) {
-    log.debug(`Called function with args: "${request}`);
-    log.info(' Requesting connection to channel: ' + request.resource);
-    log.info(`Current Server connections: ${wsServer.connections.length}`);
-    if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin
-      request.reject();
-      log.warning('Connection from origin ' + request.origin + ' rejected.');
-      return;
-    }
-    log.info('Received a request attempting to validate protocol...');
-    try {
-      connection = request.accept('echo-protocol', request.origin);
-    } catch(e) {
-      log.error(e);
-      log.warn("Server will reject this connection and carry on...");
-      return;
-    }
+  wss = new WebSocket.Server({ noServer: true });
 
-    log.info(`Connection to '${request.resource}' accepted.`);
-    log.info(`Current Server connections: ${wsServer.connections.length}`);
-    connection.on('message', function(message) {
-      log.debug(`Called function with args: "${message}`);
-      log.info(`Connection (resource name: ${connection.__resource} received a message!`);
-      if (message.type === 'utf8') {
-        log.info('Received Message: ' + message.utf8Data);
-        connection.sendUTF(message.utf8Data);
-      }
-      else if (message.type === 'binary') {
-        log.info('Received Binary Message of ' + message.binaryData.length + ' bytes');
-        connection.sendBytes(message.binaryData);
-      }
+  wss.on('connection', function(ws) {
+    log.info(`Connecting to wsserver...`);
+    connection = ws;
+
+    ws.on('message', function incoming(message) {
+      log.info(`[${channel}] received: ${message}`);
     });
-    connection.on('close', function(reasonCode, description) {
-      connection.sendUTF(`Server received close event with reason code ${reasonCode} and description ${description}...`);
-      log.warn(` Peer ${connection.remoteAddress} with resource name: ${connection.__resource} disconnected.`);
-      delete connections[_resource];
-      log.debug(wsServer);
-      connection.close();
-      log.warn(`Closing connection. Current Server connections: ${wsServer.connections.length}`);
-    });
-    let _resource = request.resource ? request.resource : '/';
+   
+    //ws.send('ping from server!');
+    log.info(`Current Server connections: ${ws._socket.server.connections}`);
+    let _resource = channel ? channel : '/';
     connections[_resource] = connection;
     //Add a reverse reference on the connection
     connections[_resource].__resource = _resource;
     //If it reaches this point means the request is successful, callback now
     _onConnectFn(connections[_resource]);
+  
   });
+  wsservers[channel] = wss;
   setupHeartBeat();
 }
 
@@ -212,7 +195,11 @@ function originIsAllowed(origin) {
 
 //Public exports
 
-exports.serverSend = (data, channel = '/main') => {
+exports.startChannel = (channel) => {
+  exports.sendServerOutput(`echo 'starting channel "${channel}"'`, [], undefined, true, channel);
+}
+
+exports.serverSend = (data, channel = DEFAULT_CHANNEL) => {
   let _isActive = connections[channel] && connections[channel].connected;
   log.info(`Sending data: connection '${channel}' is active? ${_isActive}`);
   if(!_isActive) {
@@ -221,8 +208,8 @@ exports.serverSend = (data, channel = '/main') => {
   connections[channel].sendUTF(data);
 }
 
-exports.sendServerOutput = (command, rules = [], callback, send = true, defaultChannel = '/main') => {
-  log.info(`Called function with args: "${command}", "${rules}", "${callback}", "${send}"`);
+exports.sendServerOutput = (command, rules = [], callback, send = true, defaultChannel = DEFAULT_CHANNEL) => {
+  log.info(`Called function with args: "${command}", "${rules}", "${callback}", "${send}", "${defaultChannel}"`);
   let fn = typeof command == "string" ? cmd.do : libraryCommand;
   lastPref = fn(command, (dataToSend) => {
     log.debug(`Callback from sendServerOutput with args: '${command}', '${dataToSend}'...`);
@@ -238,12 +225,13 @@ exports.sendServerOutput = (command, rules = [], callback, send = true, defaultC
           }, 1);
         }
         let _channel = `${command.channel}` == 'undefined' ? defaultChannel : command.channel;
-        log.info(`SOCKET: sendUTF event to channel '${_channel}'?`);
+        log.info(`SOCKET: send event to channel '${_channel}'?`);
+        //log.warn(connections[_channel])
         log.debug(`${send}, '${_channel}', ${connections[_channel]}`);
         log.debug(`Existing connections: ${Object.keys(connections)}`);
         if(send) {
           if(connections[_channel]) {
-            connections[_channel].sendUTF(output);
+            connections[_channel].send(output);
             log.info(`sent info via socket to channel '${_channel}'`);
           } else {
             let _err = `Trying to send message to channel '${_channel}', but that channel does not exist!`;

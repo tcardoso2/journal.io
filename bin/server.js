@@ -49,8 +49,6 @@ function startServer() {
     }
     let target = config.target[targetItem];
     server.sendServerOutput(`${config.command} ${target}`);
-    //Start the client channel
-    server.sendServerOutput("ls", [], undefined, true, "/client");
   });
 }
 
@@ -62,7 +60,9 @@ program
   .description('start the server')
   .action(() => {
     try{
+      //Configure 2 servers
       server.configure();
+      server.configure('/client');
       startWebServer();
       startServer();
     }catch(e){
