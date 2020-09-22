@@ -6,6 +6,7 @@ var http = require('http');
 var cmd = require('./lib/command');
 var connections = {};
 var wsservers = {};
+var heartbeat = require('./lib/monitoring/heartbeat')
 var Library = (library) => require(`./lib/core/${library}`);
 var processRules = require('./lib/ruleProcessor').process;
 let LOG_LEVEL = process.env.LOG_LEVEL || 'info';
@@ -116,8 +117,9 @@ var configure = (channel = DEFAULT_CHANNEL) => {
 
   wss = new WebSocket.Server({ noServer: true });
 
-  wss.on('connection', function(ws) {
-    log.info(`Connecting to wsserver...`);
+  wss.on('connection', function(ws, req) {
+    const ip = req.socket.remoteAddress;
+    log.info(`New connection to wsserver from IP: ${ip}...`);
     connection = ws;
 
     ws.on('message', function incoming(message) {
@@ -132,41 +134,9 @@ var configure = (channel = DEFAULT_CHANNEL) => {
     connections[_resource].__resource = _resource;
     //If it reaches this point means the request is successful, callback now
     _onConnectFn(connections[_resource]);
-  
   });
   wsservers[channel] = wss;
-  setupHeartBeat();
-}
-
-function setupHeartBeat() {
-  if(config.heartbeat && config.heartbeat.on) {
-    let _heartBeatCount = 0;
-    log.info("Setting up Heartbeat...");
-    let _interval = config.heartbeat.every || 10000;
-    setInterval(() => {
-      _heartBeatCount++;
-      log.info(`Sending heartbeat #${_heartBeatCount} to clients...`);
-      if(!lastPref) {
-        log.warn("Background running process does not exist, will skip heartbeat. This is ok if you are just testing");
-        return;
-      }
-      for(var conn in wsServer.connections) {
-        wsServer.connections[conn].sendUTF(`[Heartbeat from server] Last process status:\
- connected: ${lastPref.connected},\
- signalCode: ${lastPref.signalCode},\
- exitCode: ${lastPref.exitCode},\
- pid: ${lastPref.pid},\
- killed: ${lastPref.killed},\
- beat: ${_heartBeatCount},\
- timed-out: ${lastPref.timedOut}`);
-        log.debug(lastPref);
-        if(lastPref.killed) {
-          log.error(`Oh no! The underlying process was killed (pid: ${lastPref.pid})`);
-          log.debug(lastPref);
-        }
-      }
-    }, _interval);
-  }
+  heartbeat.setup(lastPref);
 }
 
 function setupProcessErrorHandling() {
@@ -185,6 +155,10 @@ function setupProcessErrorHandling() {
     }
   }
 }
+
+process.on('exit', function(code) {
+  return console.log(`Journal.io is about to exit with code ${code}`);
+});
 
 //internal functions
 
