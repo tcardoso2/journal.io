@@ -154,6 +154,7 @@ This file is mandatory, but because it might contain sensitive information has n
 
 Version History
 ---------------
+* v 0.3.10: Added Github workflow actions (ci.yml), tested on self-hosted runner 
 * v 0.3.9: Created function 'startChannel'; Troubleshooting not being able to have 2 sockets listening to different paths and one server. Changed implementation of Node.js Websockets from "WebSocket" library to "ws" to support multiple endpoints on same HTTPS server.
 * v 0.3.8: Adding support to receive messages from client, added push docker image script to registry
 * v 0.3.7: Creating build docker script in ./bin/build_docker.sh, starting work on CLI tool for interacting with the client (WIP);
