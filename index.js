@@ -24,7 +24,7 @@ const CLIENT_CHANNEL = '/client'; //Channel used by the client to send messages 
 let DEFAULT_PORT = process.env.LOG_SOCKET_PORT || 8068;
 let utils = require('./lib/utils.js');
 let log = utils.setLevel(LOG_LEVEL);
-let config = require('./config.json');
+let config = require('journal.io.config.json');
 
 //Event default callbacks
 let _onConnectFn = () => {};

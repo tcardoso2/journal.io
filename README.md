@@ -21,7 +21,7 @@ any command and capture it's output.
 ```
 npm install journal.io
 ```
-Then create a config.json file (WIP). See below an example.
+Then create under your home folder a sub-folder "node_modules" (if does not exist already) and add a journal.io.config.json file there. See below an example.
 
 * Simple example usage (API) (Server):
 ```

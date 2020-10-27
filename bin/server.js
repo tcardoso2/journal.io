@@ -3,7 +3,7 @@
 //let main = require('../../journal.io/index.js');
 let server = require('../index');
 let http = require('http');
-let config = require('../config.json');
+let config = require('journal.io.config.json');
 
 const { program } = require('commander');
 program.version(config.version);
