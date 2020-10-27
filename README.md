@@ -154,6 +154,7 @@ This file is mandatory, but because it might contain sensitive information has n
 
 Version History
 ---------------
+* v 0.4.1: (WIP) started adding cucumber for tests
 * v 0.4.0: Refactoring to improve readability and structure of code (WIP), refactoring of heartbeat code
 * v 0.3.10: Added Github workflow actions (ci.yml), tested on self-hosted runner 
 * v 0.3.9: Created function 'startChannel'; Troubleshooting not being able to have 2 sockets listening to different paths and one server. Changed implementation of Node.js Websockets from "WebSocket" library to "ws" to support multiple endpoints on same HTTPS server.

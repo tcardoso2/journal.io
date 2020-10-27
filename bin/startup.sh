@@ -6,7 +6,9 @@
 echo "============================  Starting JOURNAL.io  ============================"
 LOG_LEVEL=info
 UUIDG=$(uuidgen)
-./bin/server.js start cancel_id=$UUIDG > ./logs/journal.io.log &
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+echo $SCRIPTPATH
+$SCRIPTPATH/server.js start cancel_id=$UUIDG > ./logs/journal.io.log &
 echo $! > ./process.pid
 echo $UUIDG > ./process.uuid
 echo "Started with process id: `cat ./process.pid`"
