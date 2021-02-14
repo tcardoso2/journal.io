@@ -1,6 +1,6 @@
 {
   "name": "journal.io",
-  "version": "0.4.1-4",
+  "version": "0.4.2",
   "description": "An external (non homebridge) simple logs web-socket",
   "main": "index.js",
   "directories": {

@@ -154,6 +154,7 @@ This file is mandatory, but because it might contain sensitive information has n
 
 Version History
 ---------------
+* v 0.4.2: Added in public/ folder an example of a client-side socket script
 * v 0.4.1: (WIP) started adding cucumber for tests
 * v 0.4.0: Refactoring to improve readability and structure of code (WIP), refactoring of heartbeat code
 * v 0.3.10: Added Github workflow actions (ci.yml), tested on self-hosted runner 
