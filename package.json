@@ -27,7 +27,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "eslint": "^7.5.0",
-    "mocha": "^7.0.0"
+    "mocha": "^10.1.0"
   },
   "watch": {
     "log": "test.logs"
